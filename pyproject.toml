@@ -6,6 +6,10 @@ build-backend = "setuptools.build_meta"
 name = "mazes"
 version = "0.0.1"
 
+dependencies = [
+    "numpy ~=1.25",
+]
+
 [project.optional-dependencies]
 dev = [
     "pytest ~=7.4.0",
