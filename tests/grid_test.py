@@ -41,7 +41,7 @@ class TestGrid:
 
         for y in range(0, 3):
             for x in range(0, 2):
-                assert grid[x, y] == False, f"({x=}, {y=})"
+                assert grid[x, y] == D.Empty, f"({x=}, {y=})"
 
 
     def test_index_out_of_bounds(self):

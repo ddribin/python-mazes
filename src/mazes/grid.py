@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from enum import IntFlag, auto
-import numpy as np
 
 class Direction(IntFlag):
     Empty = 0
@@ -27,7 +26,17 @@ class Grid:
     def __init__(self, width: int, height: int) -> None:
         self._width = width
         self._height = height
-        self._grid = np.zeros((width, height))
+        self._grid = self._prepare_grid()
+
+    def _prepare_grid(self) -> list[list[Direction]]:
+        grid = []
+        for y in range(self._height):
+            row = []
+            for x in range(self._width):
+                row.append(Direction.Empty)
+            grid.append(row)
+        print(f"{grid=}")
+        return grid
 
     @property
     def width(self) -> int:
@@ -39,10 +48,9 @@ class Grid:
 
     def __getitem__(self, index: tuple[int, int]) -> Direction | None:
         x, y = index
-        if x not in range(self.width):
+        if x not in range(self._width):
             return None
-        if y not in range(self.height):
+        if y not in range(self._height):
             return None
-        print(f"{self._grid=}")
-        return self._grid[x][y]
+        return self._grid[y][x]
 
