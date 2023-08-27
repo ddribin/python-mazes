@@ -40,3 +40,45 @@ class TestGrid:
         assert grid[2, 0] == None
         assert grid[0, 3] == None
 
+    def test_setitem(self):
+        grid = Grid(3, 3)
+
+        grid[1, 1] = D.N | D.W
+
+        assert grid[1, 1] == D.N | D.W
+
+    def test_mark(self):
+        grid = Grid(3, 3)
+
+        grid.mark((1, 1), D.N)
+        grid.mark((1, 1), D.W)
+
+        assert grid[1, 1] == D.N | D.W
+
+    def test_link(self):
+        grid = Grid(3, 3)
+
+        grid.link((1, 1), D.N)
+
+        assert grid[1, 1] == D.N
+        assert grid[1, 0] == D.S
+
+    def test_link_multiple(self):
+        grid = Grid(3, 3)
+
+        grid.link((1, 1), D.N)
+        grid.link((1, 1), D.W)
+
+        assert grid[1, 1] == D.N | D.W
+        assert grid[1, 0] == D.S
+        assert grid[2, 1] == D.E
+
+
+    def test_link_edge(self):
+        grid = Grid(3, 3)
+
+        grid.link((0, 0), D.E)
+        grid.link((1, 0), D.N)
+
+        assert grid[0, 0] == D.Empty
+        assert grid[1, 0] == D.Empty
