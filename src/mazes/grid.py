@@ -1,26 +1,4 @@
-from __future__ import annotations
-
-from enum import IntFlag, auto
-
-class Direction(IntFlag):
-    Empty = 0
-    N = auto()
-    S = auto()
-    E = auto()
-    W = auto()
-
-    def opposite(self) -> Direction:
-        match self:
-            case self.N:
-                return self.S
-            case self.S:
-                return self.N
-            case self.E:
-                return self.W
-            case self.W:
-                return self.E
-            case _:
-                return self
+from .direction import Direction
 
 class Grid:
     def __init__(self, width: int, height: int) -> None:
@@ -53,4 +31,7 @@ class Grid:
         if y not in range(self._height):
             return None
         return self._grid[y][x]
+    
+    def link(self, direction: Direction, bidirectional = True) -> None:
+        ...
 

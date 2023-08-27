@@ -1,18 +1,6 @@
 from mazes import Grid, Direction as D
 
-def test_opposite_directions():
-    assert D.N.opposite() == D.S
-    assert D.S.opposite() == D.N
-    assert D.E.opposite() == D.W
-    assert D.W.opposite() == D.E
-
 class TestGrid:
-    def test_opposite_directions(self):
-        assert D.N.opposite() == D.S
-        assert D.S.opposite() == D.N
-        assert D.E.opposite() == D.W
-        assert D.W.opposite() == D.E
-
     def test_no_direction(self):
         d = D.Empty
         assert d == False
