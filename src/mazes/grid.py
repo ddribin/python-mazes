@@ -1,5 +1,7 @@
 from .direction import Direction, Coordinate
 
+from collections.abc import Iterator
+
 class Grid:
     def __init__(self, width: int, height: int) -> None:
         self._width = width
@@ -13,7 +15,6 @@ class Grid:
             for x in range(self._width):
                 row.append(Direction.Empty)
             grid.append(row)
-        print(f"{grid=}")
         return grid
 
     @property
@@ -23,6 +24,12 @@ class Grid:
     @property
     def height(self) -> int:
         return self._height
+    
+    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]:
+        for y in range(self._height):
+            for x in range(self._width):
+                yield (x, y), self._grid[y][x]
+
 
     def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
         x, y = coordinate

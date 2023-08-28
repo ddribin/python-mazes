@@ -29,6 +29,6 @@ class Direction(IntFlag):
         x, y = coordinate
         if self.N in self: y -= 1
         if self.S in self: y += 1
-        if self.E in self: x -= 1
-        if self.W in self: x += 1
+        if self.E in self: x += 1
+        if self.W in self: x -= 1
         return (x, y)

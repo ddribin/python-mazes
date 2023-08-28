@@ -67,17 +67,17 @@ class TestGrid:
         grid = Grid(3, 3)
 
         grid.link((1, 1), D.N)
-        grid.link((1, 1), D.W)
+        grid.link((1, 1), D.E)
 
-        assert grid[1, 1] == D.N | D.W
+        assert grid[1, 1] == D.N | D.E
         assert grid[1, 0] == D.S
-        assert grid[2, 1] == D.E
-
+        assert grid[2, 1] == D.W
+    
 
     def test_link_edge(self):
         grid = Grid(3, 3)
 
-        grid.link((0, 0), D.E)
+        grid.link((0, 0), D.W)
         grid.link((1, 0), D.N)
 
         assert grid[0, 0] == D.Empty

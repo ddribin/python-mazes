@@ -10,8 +10,8 @@ class TestDirection:
     def test_update_coordinate(self):
         assert D.N.update_coordinate((2, 2)) == (2, 1)
         assert D.S.update_coordinate((2, 2)) == (2, 3)
-        assert D.E.update_coordinate((2, 2)) == (1, 2)
-        assert D.W.update_coordinate((2, 2)) == (3, 2)
+        assert D.E.update_coordinate((2, 2)) == (3, 2)
+        assert D.W.update_coordinate((2, 2)) == (1, 2)
 
         dir = D.N | D.W
-        assert dir.update_coordinate((2, 2)) == (3, 1)
+        assert dir.update_coordinate((2, 2)) == (1, 1)
