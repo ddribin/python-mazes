@@ -4,6 +4,7 @@ class TestGrid:
     def test_no_direction(self):
         d = D.Empty
         assert d == False
+        
         assert d == 0
 
     def test_combo_directoins(self):
