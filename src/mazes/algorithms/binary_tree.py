@@ -2,6 +2,8 @@ from ..grid import Grid, Direction, Coordinate
 from .utils import sample
 from .algorithm import Algorithm
 
+from collections.abc import Iterator
+
 class BinaryTreeRandom:
     def choose_direction(self, directions: list[Direction]) -> Direction:
         return sample(directions)
@@ -11,7 +13,7 @@ class BinaryTree(Algorithm):
         self._grid = grid
         self._random = random
 
-    def generate(self) -> None:
+    def generate(self) -> Iterator[None]:
         grid = self._grid
         random = self._random
         width = grid.width

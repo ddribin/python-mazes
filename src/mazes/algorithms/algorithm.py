@@ -1,7 +1,8 @@
 from typing_extensions import Protocol
+from collections.abc import Iterator
 
 class Algorithm(Protocol):
-    def generate(self) -> None:
+    def generate(self) -> Iterator[None]:
         """
         Generates a maze. This is a generator method that yields at each step.
         """
