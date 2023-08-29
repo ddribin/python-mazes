@@ -21,6 +21,4 @@ dev = [
 maze = "mazes.cli:maze_cli"
 
 [tool.pytest.ini_options]
-addopts = [
-    "--import-mode=importlib",
-]
+pythonpath = "tests"

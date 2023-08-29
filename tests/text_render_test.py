@@ -1,6 +1,6 @@
 from mazes import Grid, Direction as D
 from mazes.text_renderer import TextRenderer
-from tests.asserts import *
+from .asserts import *
 
 class TestTextRenderer:
     def test_empty_grid(self):
