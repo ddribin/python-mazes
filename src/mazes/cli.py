@@ -5,6 +5,7 @@ from .grid import Grid
 from .renderers import TextRenderer, ImageRenderer
 from .algorithms import Algorithm, BinaryTree
 
+
 class MazeCli:
     def __init__(self) -> None:
         self.width = 5
@@ -15,7 +16,7 @@ class MazeCli:
     def execute(self) -> int:
         self.parse_arguments()
         return self.run()
-    
+
     def parse_arguments(self) -> None:
         parser = argparse.ArgumentParser()
         parser.add_argument("width", type=int, help="Width of the maze")
@@ -41,7 +42,7 @@ class MazeCli:
         if self.output is not None:
             ImageRenderer.render_grid_to_png_file(grid, self.output)
         return 0
-    
+
     def make_algorithm(self, grid: Grid) -> Algorithm:
         algorithm = BinaryTree(grid)
         return algorithm
@@ -52,6 +53,7 @@ class MazeCli:
             seed = random.randint(0, 2**64 - 1)
         random.seed(seed)
         return seed
+
 
 def maze_cli() -> int:
     cli = MazeCli()

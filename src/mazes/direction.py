@@ -5,6 +5,7 @@ from typing import TypeAlias
 
 Coordinate: TypeAlias = tuple[int, int]
 
+
 class Direction(IntFlag):
     Empty = 0
     N = auto()
@@ -24,11 +25,15 @@ class Direction(IntFlag):
                 return Direction.E
             case _:
                 return self
-            
+
     def update_coordinate(self, coordinate: Coordinate) -> Coordinate:
         x, y = coordinate
-        if Direction.N in self: y -= 1
-        if Direction.S in self: y += 1
-        if Direction.E in self: x += 1
-        if Direction.W in self: x -= 1
+        if Direction.N in self:
+            y -= 1
+        if Direction.S in self:
+            y += 1
+        if Direction.E in self:
+            x += 1
+        if Direction.W in self:
+            x -= 1
         return (x, y)

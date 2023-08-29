@@ -3,21 +3,29 @@ from .direction import Direction, Coordinate
 from collections.abc import Iterator
 from typing_extensions import Protocol
 
+
 class ImmutableGrid(Protocol):
     @property
-    def width(self) -> int: ...
+    def width(self) -> int:
+        ...
 
     @property
-    def height(self) -> int: ...
+    def height(self) -> int:
+        ...
 
-    def is_valid_coordinate(self, coordinate: Coordinate) -> bool: ...
+    def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
+        ...
 
-    def __getitem__(self, index: Coordinate) -> Direction | None: ...
+    def __getitem__(self, index: Coordinate) -> Direction | None:
+        ...
 
-    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]: ...
-    
-    def coordinates(self) -> Iterator[Coordinate]: ...
-    
+    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]:
+        ...
+
+    def coordinates(self) -> Iterator[Coordinate]:
+        ...
+
+
 class Grid(ImmutableGrid):
     def __init__(self, width: int, height: int) -> None:
         self._width = width
@@ -36,7 +44,7 @@ class Grid(ImmutableGrid):
     @property
     def width(self) -> int:
         return self._width
-    
+
     @property
     def height(self) -> int:
         return self._height
@@ -55,7 +63,7 @@ class Grid(ImmutableGrid):
             return self._grid[y][x]
         else:
             return None
-    
+
     def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]:
         for y in range(self._height):
             for x in range(self._width):
@@ -66,25 +74,25 @@ class Grid(ImmutableGrid):
             for x in range(self._width):
                 yield (x, y)
 
-
     # Mutable Methods
-    
+
     def __setitem__(self, index: Coordinate, direction: Direction) -> None:
         if self.is_valid_coordinate(index):
             x, y = index
             self._grid[y][x] = direction
-    
+
     def mark(self, coordinate: Coordinate, direction: Direction) -> None:
         if self.is_valid_coordinate(coordinate):
             x, y = coordinate
             self._grid[y][x] |= direction
-    
-    def link(self, coordinate: Coordinate, direction: Direction,
-             bidirectional = True) -> None:
+
+    def link(
+        self, coordinate: Coordinate, direction: Direction, bidirectional=True
+    ) -> None:
         other_coordinate = direction.update_coordinate(coordinate)
         if not self.is_valid_coordinate(other_coordinate):
             return
-        
+
         self.mark(coordinate, direction)
         if bidirectional:
             direction = direction.opposite()

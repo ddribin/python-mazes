@@ -1,7 +1,8 @@
 import random
 from typing import TypeVar, Sequence
 
-T = TypeVar('T')
+T = TypeVar("T")
+
 
 def sample(l: Sequence[T]) -> T:
     index = random.randint(0, len(l) - 1)

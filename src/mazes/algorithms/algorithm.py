@@ -1,6 +1,7 @@
 from typing_extensions import Protocol
 from collections.abc import Iterator
 
+
 class Algorithm(Protocol):
     def steps(self) -> Iterator[None]:
         """

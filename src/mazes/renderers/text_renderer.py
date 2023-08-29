@@ -1,5 +1,6 @@
 from ..grid import ImmutableGrid, Direction
 
+
 class TextRenderer:
     @classmethod
     def render_grid(cls, grid: ImmutableGrid) -> str:
@@ -15,13 +16,13 @@ class TextRenderer:
         output = "+" + "---+" * width + "\n"
         top = ""
         bottom = ""
-        for (coordinate, linked) in grid:
+        for coordinate, linked in grid:
             x, y = coordinate
             if x == 0:
                 top = "|"
                 bottom = "+"
 
-            body = "   " # Three spaces
+            body = "   "  # Three spaces
             east_boundary = " " if Direction.E in linked else "|"
             top += body + east_boundary
 
@@ -29,7 +30,7 @@ class TextRenderer:
             corner = "+"
             bottom += south_boundary + corner
 
-            if x == width-1:
+            if x == width - 1:
                 output += top + "\n"
                 output += bottom + "\n"
 

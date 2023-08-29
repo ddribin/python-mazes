@@ -3,4 +3,4 @@ class Maze:
         pass
 
     def increment(self, i: int) -> int:
-        return i+1
+        return i + 1
