@@ -1,11 +1,12 @@
 from ..grid import Grid, Direction, Coordinate
 from .utils import sample
+from .algorithm import Algorithm
 
 class BinaryTreeRandom:
     def choose_direction(self, directions: list[Direction]) -> Direction:
         return sample(directions)
 
-class BinaryTree:
+class BinaryTree(Algorithm):
     def __init__(self, grid: Grid, random = BinaryTreeRandom()) -> None:
         self._grid = grid
         self._random = random
@@ -28,7 +29,3 @@ class BinaryTree:
                 grid.link(coord, neighbor)
 
             yield
-
-    def generate_all(self) -> None:
-        for _ in self.generate():
-            pass

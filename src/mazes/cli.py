@@ -1,6 +1,6 @@
 from .grid import Grid
 from .text_renderer import TextRenderer
-from .algorithms import BinaryTree
+from .algorithms import Algorithm, BinaryTree
 
 import argparse
 import random
@@ -30,12 +30,16 @@ class MazeCli:
     def run(self) -> int:
         seed = self.setup_seed()
         grid = Grid(self.width, self.height)
-        algorithm = BinaryTree(grid)
+        algorithm = self.make_algorithm(grid)
         render = TextRenderer(grid)
         algorithm.generate_all()
         print(render.render())
         print(f"Seed: {seed}")
         return 0
+    
+    def make_algorithm(self, grid: Grid) -> Algorithm:
+        algorithm = BinaryTree(grid)
+        return algorithm
 
     def setup_seed(self) -> int:
         seed = self.seed
