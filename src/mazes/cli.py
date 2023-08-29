@@ -2,7 +2,7 @@ import argparse
 import random
 
 from .grid import Grid
-from .renderers.text_renderer import TextRenderer
+from .renderers import TextRenderer, ImageRenderer
 from .algorithms import Algorithm, BinaryTree
 
 class MazeCli:
@@ -10,6 +10,7 @@ class MazeCli:
         self.width = 5
         self.height = 5
         self.seed: int | None = None
+        self.output: str | None = None
 
     def execute(self) -> int:
         self.parse_arguments()
@@ -20,12 +21,14 @@ class MazeCli:
         parser.add_argument("width", type=int, help="Width of the maze")
         parser.add_argument("height", type=int, help="Height of the maze")
         parser.add_argument("-s", "--seed", type=int, help="Random number seed")
+        parser.add_argument("-o", "--output", type=str, help="Output file")
 
         args = parser.parse_args()
 
         self.width = args.width
         self.height = args.height
         self.seed = args.seed
+        self.output = args.output
 
     def run(self) -> int:
         seed = self.setup_seed()
@@ -35,6 +38,8 @@ class MazeCli:
         algorithm.generate()
         print(render.render())
         print(f"Seed: {seed}")
+        if self.output is not None:
+            ImageRenderer.render_grid_to_png_file(grid, self.output)
         return 0
     
     def make_algorithm(self, grid: Grid) -> Algorithm:
