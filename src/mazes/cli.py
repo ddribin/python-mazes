@@ -22,7 +22,6 @@ class MazeCli:
         parser.add_argument("-s", "--seed", type=int, help="Random number seed")
 
         args = parser.parse_args()
-        print(args.seed)
 
         self.width = args.width
         self.height = args.height
@@ -31,12 +30,17 @@ class MazeCli:
     def run(self) -> int:
         seed = self.setup_seed()
         grid = Grid(self.width, self.height)
-        BinaryTree.on(grid)
+        algorithm = BinaryTree(grid)
         render = TextRenderer(grid)
+        self.generate_all(algorithm)
         print(render.render())
         print(f"Seed: {seed}")
         return 0
     
+    def generate_all(self, algorithm: BinaryTree) -> None:
+        for _ in algorithm.generate():
+            pass
+
     def setup_seed(self) -> int:
         seed = self.seed
         if seed is None:

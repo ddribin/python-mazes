@@ -10,17 +10,22 @@ def sample(l: Sequence[T]) -> T:
     return l[index]
 
 class BinaryTree:
-    @classmethod
-    def on(cls, grid: Grid) -> None:
+    def __init__(self, grid: Grid) -> None:
+        self._grid = grid
+
+    def generate(self) -> None:
+        grid = self._grid
         width = grid.width
-        for coord, linked in grid:
+        for coord in grid.coordinates():
             x, y = coord
             neighbors: list[Direction] = []
-            if y > 0 and Direction.N not in linked:
-                neighbors.append(Direction.N) # type: ignore
-            if x < width-1 and Direction.E not in linked:
-                neighbors.append(Direction.E) # type: ignore
+            if y > 0:
+                neighbors.append(Direction.N)
+            if x < width-1:
+                neighbors.append(Direction.E)
 
             if len(neighbors) != 0:
                 neighbor = sample(neighbors)
                 grid.link(coord, neighbor)
+
+            yield

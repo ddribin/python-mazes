@@ -24,12 +24,6 @@ class Grid:
     @property
     def height(self) -> int:
         return self._height
-    
-    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]:
-        for y in range(self._height):
-            for x in range(self._width):
-                yield (x, y), self._grid[y][x]
-
 
     def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
         x, y = coordinate
@@ -45,6 +39,19 @@ class Grid:
             return self._grid[y][x]
         else:
             return None
+    
+    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]:
+        for y in range(self._height):
+            for x in range(self._width):
+                yield (x, y), self._grid[y][x]
+
+    def coordinates(self) -> Iterator[Coordinate]:
+        for y in range(self._height):
+            for x in range(self._width):
+                yield (x, y)
+
+
+    # Mutable Methods
     
     def __setitem__(self, index: Coordinate, direction: Direction) -> None:
         if self.is_valid_coordinate(index):
