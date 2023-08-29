@@ -39,6 +39,6 @@ class TestBinaryTree:
     def render_grid(self, grid: Grid, fake_directions: list[D]) -> str:
         random = FakeBinaryTreeRandom(fake_directions)
         binary_tree = BinaryTree(grid, random)
-        binary_tree.generate_all()
+        binary_tree.generate()
         text = TextRenderer.render_grid(grid)
         return text

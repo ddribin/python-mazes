@@ -32,7 +32,7 @@ class MazeCli:
         grid = Grid(self.width, self.height)
         algorithm = self.make_algorithm(grid)
         render = TextRenderer(grid)
-        algorithm.generate_all()
+        algorithm.generate()
         print(render.render())
         print(f"Seed: {seed}")
         return 0

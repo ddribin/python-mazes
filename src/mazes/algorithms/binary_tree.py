@@ -13,7 +13,7 @@ class BinaryTree(Algorithm):
         self._grid = grid
         self._random = random
 
-    def generate(self) -> Iterator[None]:
+    def steps(self) -> Iterator[None]:
         grid = self._grid
         random = self._random
         width = grid.width
