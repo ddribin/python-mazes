@@ -2,7 +2,7 @@ import argparse
 import random
 
 from .grid import Grid
-from .text_renderer import TextRenderer
+from .renderers.text_renderer import TextRenderer
 from .algorithms import Algorithm, BinaryTree
 
 class MazeCli:

@@ -1,6 +1,6 @@
 from mazes.algorithms import BinaryTree, BinaryTreeRandom
 from mazes.grid import Grid, Direction as D
-from mazes.text_renderer import TextRenderer
+from mazes.renderers.text_renderer import TextRenderer
 from ..asserts import *
 
 class FakeBinaryTreeRandom(BinaryTreeRandom):

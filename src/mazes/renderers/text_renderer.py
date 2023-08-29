@@ -1,4 +1,4 @@
-from .grid import ImmutableGrid, Direction
+from ..grid import ImmutableGrid, Direction
 
 class TextRenderer:
     @classmethod
