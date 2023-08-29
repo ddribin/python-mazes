@@ -1,9 +1,9 @@
+import argparse
+import random
+
 from .grid import Grid
 from .text_renderer import TextRenderer
 from .algorithms import Algorithm, BinaryTree
-
-import argparse
-import random
 
 class MazeCli:
     def __init__(self) -> None:
