@@ -32,14 +32,10 @@ class MazeCli:
         grid = Grid(self.width, self.height)
         algorithm = BinaryTree(grid)
         render = TextRenderer(grid)
-        self.generate_all(algorithm)
+        algorithm.generate_all()
         print(render.render())
         print(f"Seed: {seed}")
         return 0
-    
-    def generate_all(self, algorithm: BinaryTree) -> None:
-        for _ in algorithm.generate():
-            pass
 
     def setup_seed(self) -> int:
         seed = self.seed

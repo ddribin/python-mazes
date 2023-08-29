@@ -1,8 +1,26 @@
 from .direction import Direction, Coordinate
 
 from collections.abc import Iterator
+from typing_extensions import Protocol
 
-class Grid:
+class ImmutableGrid(Protocol):
+    @property
+    def width(self) -> int: ...
+
+    @property
+    def height(self) -> int: ...
+
+    def is_valid_coordinate(self, coordinate: Coordinate) -> bool: ...
+
+    def __getitem__(self, index: Coordinate) -> Direction | None: ...
+
+    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]: ...
+
+    def __iter__(self) -> Iterator[tuple[Coordinate, Direction]]: ...
+    
+    def coordinates(self) -> Iterator[Coordinate]: ...
+    
+class Grid(ImmutableGrid):
     def __init__(self, width: int, height: int) -> None:
         self._width = width
         self._height = height
@@ -73,6 +91,3 @@ class Grid:
         if bidirectional:
             direction = direction.opposite()
             self.mark(other_coordinate, direction)
-
-
-

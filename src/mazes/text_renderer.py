@@ -1,7 +1,12 @@
-from .grid import Grid, Direction
+from .grid import ImmutableGrid, Direction
 
 class TextRenderer:
-    def __init__(self, grid: Grid) -> None:
+    @classmethod
+    def render_grid(cls, grid: ImmutableGrid) -> str:
+        renderer = TextRenderer(grid)
+        return renderer.render()
+
+    def __init__(self, grid: ImmutableGrid) -> None:
         self._grid = grid
 
     def render(self) -> str:
