@@ -14,21 +14,21 @@ class Direction(IntFlag):
 
     def opposite(self) -> Direction:
         match self:
-            case self.N:
-                return self.S
-            case self.S:
-                return self.N
-            case self.E:
-                return self.W
-            case self.W:
-                return self.E
+            case Direction.N:
+                return Direction.S
+            case Direction.S:
+                return Direction.N
+            case Direction.E:
+                return Direction.W
+            case Direction.W:
+                return Direction.E
             case _:
                 return self
             
     def update_coordinate(self, coordinate: Coordinate) -> Coordinate:
         x, y = coordinate
-        if self.N in self: y -= 1
-        if self.S in self: y += 1
-        if self.E in self: x += 1
-        if self.W in self: x -= 1
+        if Direction.N in self: y -= 1
+        if Direction.S in self: y += 1
+        if Direction.E in self: x += 1
+        if Direction.W in self: x -= 1
         return (x, y)
