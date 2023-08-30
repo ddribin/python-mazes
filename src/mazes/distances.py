@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 from .direction import Direction, Coordinate
 from .grid import ImmutableGrid
 
@@ -7,9 +9,10 @@ Distance = int | None
 
 
 class Distances:
-    def __init__(self, width: int, height: int) -> None:
+    def __init__(self, width: int, height: int, root: Coordinate) -> None:
         self._width = width
         self._height = height
+        self._root = root
         self._grid = self._prepare_grid()
 
     def _prepare_grid(self) -> list[list[Distance]]:
@@ -49,9 +52,26 @@ class Distances:
         x, y = index
         self._grid[y][x] = distance
 
+    def coordinates(self) -> Iterator[Coordinate]:
+        for y in range(self._height):
+            for x in range(self._width):
+                yield (x, y)
+
+    def max(self) -> tuple[Coordinate, int]:
+        max_distance = 0
+        max_coord = self._root
+
+        for coord in self.coordinates():
+            distance = self[coord]
+            if distance is not None and distance > max_distance:
+                max_coord = coord
+                max_distance = distance
+
+        return (max_coord, max_distance)
+
     @classmethod
     def from_root(cls, grid: ImmutableGrid, root: Coordinate) -> Distances:
-        distances = Distances(grid.width, grid.height)
+        distances = Distances(grid.width, grid.height, root)
         distances[root] = 0
         frontier = [root]
 

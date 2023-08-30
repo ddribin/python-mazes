@@ -51,7 +51,7 @@ class TextRenderer:
         return self.to_base36(distance)
 
     def to_base36(self, i: int) -> str:
-        BASE_36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        BASE_36 = "0123456789" "abcdefghijklmnopqrstuvwxyz" "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         if i < len(BASE_36):
             return BASE_36[i]
         else:

@@ -59,7 +59,8 @@ class MazeCli:
 
         distances: Distances | None = None
         if self.calculate_distances:
-            distances = Distances.from_root(grid, (0, 0))
+            middle = (int(grid.width / 2), int(grid.height / 2))
+            distances = Distances.from_root(grid, middle)
 
         self.output_maze(grid, distances)
         print(f"Seed: {seed}")
@@ -81,7 +82,7 @@ class MazeCli:
             return
 
         if path.suffix == ".png":
-            ImageRenderer.render_grid_to_png_file(grid, str(path))
+            ImageRenderer.render_grid_to_png_file(grid, str(path), distances)
             return
 
         raise CommandError(f"Invalid filename: {output}")
