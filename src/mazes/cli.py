@@ -4,9 +4,6 @@ import sys
 from pathlib import Path
 
 from .maze import Maze
-from .grid import Grid, ImmutableGrid
-from .renderers import TextRenderer, ImageRenderer
-from .distances import Distances
 
 
 class CommandError(Exception):
@@ -54,30 +51,31 @@ class MazeCli:
     def run(self) -> None:
         seed = self.setup_seed()
         maze = Maze.generate(
-            self.width, self.height, Maze.Type.BinaryTree, self.calculate_distances
+            self.width,
+            self.height,
+            Maze.AlgorithmType.BinaryTree,
+            self.calculate_distances,
         )
 
-        self.output_maze(maze.grid, maze.distances)
+        self.output_maze(maze)
         print(f"Seed: {seed}")
 
-    def output_maze(self, grid: ImmutableGrid, distances: Distances | None) -> None:
+    def output_maze(self, maze: Maze) -> None:
         output = self.output
-        use_stdout: bool
-        is_text: bool
 
         if output is None or output == "-":
-            text = TextRenderer.render_grid(grid, distances)
+            text = str(maze)
             print(text)
             return
 
         path = Path(output)
         if path.suffix == ".txt":
-            text = TextRenderer.render_grid(grid, distances)
+            text = str(maze)
             path.write_text(text)
             return
 
         if path.suffix == ".png":
-            ImageRenderer.render_grid_to_png_file(grid, str(path), distances)
+            maze.write_png(str(path))
             return
 
         raise CommandError(f"Invalid filename: {output}")

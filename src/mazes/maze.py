@@ -5,10 +5,11 @@ from enum import Enum, auto
 from .algorithms import Algorithm, BinaryTree
 from .distances import Distances
 from .grid import Grid, ImmutableGrid
+from .renderers import TextRenderer, ImageRenderer
 
 
 class Maze:
-    class Type(Enum):
+    class AlgorithmType(Enum):
         BinaryTree = auto()
 
     @classmethod
@@ -16,12 +17,12 @@ class Maze:
         cls,
         width: int,
         height: int,
-        mazeType: Maze.Type,
+        algorithmType: Maze.AlgorithmType,
         calculate_distances: bool = False,
     ) -> Maze:
         grid = Grid(width, height)
 
-        algorithm = Maze.make_algorithm(mazeType, grid)
+        algorithm = Maze.make_algorithm(algorithmType, grid)
         algorithm.generate()
 
         distances: Distances | None = None
@@ -32,9 +33,9 @@ class Maze:
         return Maze(grid, distances)
 
     @classmethod
-    def make_algorithm(cls, mazeType: Maze.Type, grid: Grid) -> Algorithm:
+    def make_algorithm(cls, mazeType: Maze.AlgorithmType, grid: Grid) -> Algorithm:
         match mazeType:
-            case Maze.Type.BinaryTree:
+            case Maze.AlgorithmType.BinaryTree:
                 return BinaryTree(grid)
 
             case _:
@@ -60,3 +61,12 @@ class Maze:
     @property
     def height(self) -> int:
         return self._grid.height
+
+    def __str__(self) -> str:
+        renderer = TextRenderer(self._grid, self._distances)
+        text = renderer.render()
+        return text
+
+    def write_png(self, file_name: str) -> None:
+        renderer = ImageRenderer(self._grid, self._distances)
+        renderer.render_png_file(file_name)
