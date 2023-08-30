@@ -1,7 +1,7 @@
-from .direction import Direction, Coordinate
-
 from collections.abc import Iterator
 from typing_extensions import Protocol
+
+from .direction import Direction, Coordinate
 
 
 class ImmutableGrid(Protocol):
@@ -33,12 +33,8 @@ class Grid(ImmutableGrid):
         self._grid = self._prepare_grid()
 
     def _prepare_grid(self) -> list[list[Direction]]:
-        grid = []
-        for y in range(self._height):
-            row = []
-            for x in range(self._width):
-                row.append(Direction.Empty)
-            grid.append(row)
+        row = [Direction.Empty] * self._width
+        grid = [row.copy() for _ in range(self._height)]
         return grid
 
     @property

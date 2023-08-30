@@ -6,6 +6,7 @@ from pathlib import Path
 from .grid import Grid, ImmutableGrid
 from .renderers import TextRenderer, ImageRenderer
 from .algorithms import Algorithm, BinaryTree
+from .distances import Distances
 
 
 class CommandError(Exception):
@@ -38,6 +39,9 @@ class MazeCli:
         parser.add_argument(
             "-o", "--output", type=str, help="Output file. Supports .txt and .png."
         )
+        parser.add_argument(
+            "-d", "--distances", action="store_true", help="Calculate distances"
+        )
 
         args = parser.parse_args()
 
@@ -45,6 +49,7 @@ class MazeCli:
         self.height = args.height
         self.seed = args.seed
         self.output = args.output
+        self.calculate_distances = args.distances
 
     def run(self) -> None:
         seed = self.setup_seed()
@@ -52,22 +57,26 @@ class MazeCli:
         algorithm = self.make_algorithm(grid)
         algorithm.generate()
 
-        self.output_maze(grid)
+        distances: Distances | None = None
+        if self.calculate_distances:
+            distances = Distances.from_root(grid, (0, 0))
+
+        self.output_maze(grid, distances)
         print(f"Seed: {seed}")
 
-    def output_maze(self, grid: ImmutableGrid) -> None:
+    def output_maze(self, grid: ImmutableGrid, distances: Distances | None) -> None:
         output = self.output
         use_stdout: bool
         is_text: bool
 
         if output is None or output == "-":
-            text = TextRenderer.render_grid(grid)
+            text = TextRenderer.render_grid(grid, distances)
             print(text)
             return
 
         path = Path(output)
         if path.suffix == ".txt":
-            text = TextRenderer.render_grid(grid)
+            text = TextRenderer.render_grid(grid, distances)
             path.write_text(text)
             return
 

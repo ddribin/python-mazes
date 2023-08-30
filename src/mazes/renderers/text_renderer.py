@@ -1,14 +1,18 @@
-from ..grid import ImmutableGrid, Direction
+from ..grid import ImmutableGrid, Direction, Coordinate
+from ..distances import Distances
 
 
 class TextRenderer:
     @classmethod
-    def render_grid(cls, grid: ImmutableGrid) -> str:
-        renderer = TextRenderer(grid)
+    def render_grid(
+        cls, grid: ImmutableGrid, distances: Distances | None = None
+    ) -> str:
+        renderer = TextRenderer(grid, distances)
         return renderer.render()
 
-    def __init__(self, grid: ImmutableGrid) -> None:
+    def __init__(self, grid: ImmutableGrid, distances: Distances | None = None) -> None:
         self._grid = grid
+        self._distances = distances
 
     def render(self) -> str:
         grid = self._grid
@@ -22,7 +26,8 @@ class TextRenderer:
                 top = "|"
                 bottom = "+"
 
-            body = "   "  # Three spaces
+            contents = self.contents_of(coordinate)
+            body = f" {contents} "  # Three characters
             east_boundary = " " if Direction.E in linked else "|"
             top += body + east_boundary
 
@@ -35,3 +40,19 @@ class TextRenderer:
                 output += bottom + "\n"
 
         return output
+
+    def contents_of(self, coordinate: Coordinate) -> str:
+        if self._distances is None:
+            return " "
+
+        distance = self._distances[coordinate]
+        if distance is None:
+            return " "
+        return self.to_base36(distance)
+
+    def to_base36(self, i: int) -> str:
+        BASE_36 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        if i < len(BASE_36):
+            return BASE_36[i]
+        else:
+            return "!"
