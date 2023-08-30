@@ -3,9 +3,9 @@ import random
 import sys
 from pathlib import Path
 
+from .maze import Maze
 from .grid import Grid, ImmutableGrid
 from .renderers import TextRenderer, ImageRenderer
-from .algorithms import Algorithm, BinaryTree
 from .distances import Distances
 
 
@@ -53,16 +53,11 @@ class MazeCli:
 
     def run(self) -> None:
         seed = self.setup_seed()
-        grid = Grid(self.width, self.height)
-        algorithm = self.make_algorithm(grid)
-        algorithm.generate()
+        maze = Maze.generate(
+            self.width, self.height, Maze.Type.BinaryTree, self.calculate_distances
+        )
 
-        distances: Distances | None = None
-        if self.calculate_distances:
-            middle = (int(grid.width / 2), int(grid.height / 2))
-            distances = Distances.from_root(grid, middle)
-
-        self.output_maze(grid, distances)
+        self.output_maze(maze.grid, maze.distances)
         print(f"Seed: {seed}")
 
     def output_maze(self, grid: ImmutableGrid, distances: Distances | None) -> None:
@@ -86,10 +81,6 @@ class MazeCli:
             return
 
         raise CommandError(f"Invalid filename: {output}")
-
-    def make_algorithm(self, grid: Grid) -> Algorithm:
-        algorithm = BinaryTree(grid)
-        return algorithm
 
     def setup_seed(self) -> int:
         seed = self.seed
