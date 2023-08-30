@@ -1,9 +1,15 @@
 import argparse
 import random
+import sys
+from pathlib import Path
 
-from .grid import Grid
+from .grid import Grid, ImmutableGrid
 from .renderers import TextRenderer, ImageRenderer
 from .algorithms import Algorithm, BinaryTree
+
+
+class CommandError(Exception):
+    pass
 
 
 class MazeCli:
@@ -14,15 +20,24 @@ class MazeCli:
         self.output: str | None = None
 
     def execute(self) -> int:
-        self.parse_arguments()
-        return self.run()
+        try:
+            self.parse_arguments()
+            self.run()
+            return 0
+        except CommandError as e:
+            message = e.args[0]
+            sys.stderr.write(f"{message}\n")
+            result = e.args[1] if len(e.args) == 2 else 1
+            return result
 
     def parse_arguments(self) -> None:
         parser = argparse.ArgumentParser()
         parser.add_argument("width", type=int, help="Width of the maze")
         parser.add_argument("height", type=int, help="Height of the maze")
         parser.add_argument("-s", "--seed", type=int, help="Random number seed")
-        parser.add_argument("-o", "--output", type=str, help="Output file")
+        parser.add_argument(
+            "-o", "--output", type=str, help="Output file. Supports .txt and .png."
+        )
 
         args = parser.parse_args()
 
@@ -31,18 +46,36 @@ class MazeCli:
         self.seed = args.seed
         self.output = args.output
 
-    def run(self) -> int:
+    def run(self) -> None:
         seed = self.setup_seed()
         grid = Grid(self.width, self.height)
         algorithm = self.make_algorithm(grid)
         algorithm.generate()
 
-        print(TextRenderer.render_grid(grid))
+        self.output_maze(grid)
         print(f"Seed: {seed}")
 
-        if self.output is not None:
-            ImageRenderer.render_grid_to_png_file(grid, self.output)
-        return 0
+    def output_maze(self, grid: ImmutableGrid) -> None:
+        output = self.output
+        use_stdout: bool
+        is_text: bool
+
+        if output is None or output == "-":
+            text = TextRenderer.render_grid(grid)
+            print(text)
+            return
+
+        path = Path(output)
+        if path.suffix == ".txt":
+            text = TextRenderer.render_grid(grid)
+            path.write_text(text)
+            return
+
+        if path.suffix == ".png":
+            ImageRenderer.render_grid_to_png_file(grid, str(path))
+            return
+
+        raise CommandError(f"Invalid filename: {output}")
 
     def make_algorithm(self, grid: Grid) -> Algorithm:
         algorithm = BinaryTree(grid)
