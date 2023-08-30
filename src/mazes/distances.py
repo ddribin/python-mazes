@@ -82,8 +82,7 @@ class Distances:
                 linked = grid[current]
                 if linked is not None:
                     distance = distances[current]
-                    if distance is None:
-                        raise RuntimeError
+                    assert distance is not None
 
                     for direction in linked:
                         next_coord = direction.update_coordinate(current)
