@@ -35,10 +35,11 @@ class MazeCli:
         seed = self.setup_seed()
         grid = Grid(self.width, self.height)
         algorithm = self.make_algorithm(grid)
-        render = TextRenderer(grid)
         algorithm.generate()
-        print(render.render())
+
+        print(TextRenderer.render_grid(grid))
         print(f"Seed: {seed}")
+
         if self.output is not None:
             ImageRenderer.render_grid_to_png_file(grid, self.output)
         return 0
