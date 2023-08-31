@@ -82,6 +82,8 @@ class ImageRenderer:
         distance = self._distances[coord]
         if distance is None:
             return None
+        if self._maximum == 0:
+            return (255, 0, 0)
         intensity = float(self._maximum - distance) / self._maximum
         dark = round(255 * intensity)
         bright = 128 + round(127 * intensity)

@@ -16,6 +16,7 @@ class CommandLine:
         self.height = 5
         self.seed: int | None = None
         self.output: str | None = None
+        self.overlay_type: str | None = None
 
     def execute(self) -> int:
         try:
@@ -37,7 +38,7 @@ class CommandLine:
             "-o", "--output", type=str, help="Output file. Supports .txt and .png."
         )
         parser.add_argument(
-            "-d", "--distances", action="store_true", help="Calculate distances"
+            "-O", "--overlay", choices=["none", "distance", "path", "longest"]
         )
 
         args = parser.parse_args()
@@ -46,19 +47,30 @@ class CommandLine:
         self.height = args.height
         self.seed = args.seed
         self.output = args.output
-        self.calculate_distances = args.distances
+        self.overlay_type = args.overlay
 
     def run(self) -> None:
         seed = self.setup_seed()
-        maze = Maze.generate(
-            self.width,
-            self.height,
-            Maze.AlgorithmType.BinaryTree,
-            self.calculate_distances,
-        )
-
+        maze = self.generate_maze()
         self.output_maze(maze)
         print(f"Seed: {seed}")
+
+    def generate_maze(self) -> Maze:
+        overlayType: Maze.OverlayType
+        match self.overlay_type:
+            case "distance":
+                overlayType = Maze.OverlayType.Distance
+            case "path":
+                overlayType = Maze.OverlayType.PathTo
+            case "longest":
+                overlayType = Maze.OverlayType.LongestPath
+            case _:
+                overlayType = Maze.OverlayType.Nothing
+
+        maze = Maze.generate(
+            self.width, self.height, Maze.AlgorithmType.BinaryTree, overlayType
+        )
+        return maze
 
     def output_maze(self, maze: Maze) -> None:
         output = self.output

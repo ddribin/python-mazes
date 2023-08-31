@@ -14,6 +14,7 @@ class Distances:
         self._height = height
         self._root = root
         self._grid = self._prepare_grid()
+        self._max = ((0, 0), 0)
 
     def _prepare_grid(self) -> list[list[Distance]]:
         row: list[Distance] = [None] * self._width
