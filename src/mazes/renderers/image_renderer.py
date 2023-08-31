@@ -1,9 +1,15 @@
 from PIL import Image, ImageDraw
+from enum import Enum, auto
 
 from ..grid import ImmutableGrid, Direction, Coordinate
 from ..distances import Distances
 
 Color = tuple[int, int, int]
+
+
+class Mode(Enum):
+    Backgrounds = auto()
+    Walls = auto()
 
 
 class ImageRenderer:
@@ -25,7 +31,7 @@ class ImageRenderer:
         self._distances = distances
         self._maximum = 0
         if distances is not None:
-            _, self._maximum = distances.max()
+            _, self._maximum = distances.max
         self._cell_size = cell_size
         self._padding = padding
 
@@ -47,7 +53,7 @@ class ImageRenderer:
         image = Image.new("RGBA", (img_width + 1, img_height + 1), color=background)
         draw = ImageDraw.Draw(image)
 
-        for mode in ["backgrounds", "walls"]:
+        for mode in [Mode.Backgrounds, Mode.Walls]:
             for coords, dir in grid:
                 grid_x, grid_y = coords
                 x1 = grid_x * cell_size + padding
@@ -55,7 +61,7 @@ class ImageRenderer:
                 x2 = (grid_x + 1) * cell_size + padding
                 y2 = (grid_y + 1) * cell_size + padding
 
-                if mode == "backgrounds":
+                if mode == Mode.Backgrounds:
                     color = self.background_color_of(coords)
                     draw.rectangle((x1, y1, x2, y2), fill=color)
                 else:

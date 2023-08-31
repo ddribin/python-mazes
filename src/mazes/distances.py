@@ -57,7 +57,15 @@ class Distances:
             for x in range(self._width):
                 yield (x, y)
 
+    def _set_max(self, coordinate: Coordinate, distance: int) -> None:
+        self._max = (coordinate, distance)
+
+    @property
     def max(self) -> tuple[Coordinate, int]:
+        return self._max
+
+    @property
+    def max_(self) -> tuple[Coordinate, int]:
         max_distance = 0
         max_coord = self._root
 
@@ -74,6 +82,8 @@ class Distances:
         distances = Distances(grid.width, grid.height, root)
         distances[root] = 0
         frontier = [root]
+        max_coord = root
+        max_distance = 0
 
         while frontier:
             new_frontier: list[Coordinate] = []
@@ -89,9 +99,15 @@ class Distances:
                         next_distance = distances[next_coord]
                         if next_distance is not None:
                             continue
-                        distances[next_coord] = distance + 1
+                        next_distance = distance + 1
+                        distances[next_coord] = next_distance
                         new_frontier.append(next_coord)
+                        if next_distance > max_distance:
+                            max_coord = next_coord
+                            max_distance = next_distance
 
             frontier = new_frontier
+
+        distances._set_max(max_coord, max_distance)
 
         return distances

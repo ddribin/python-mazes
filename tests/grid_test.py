@@ -1,10 +1,11 @@
 from mazes import Grid, Direction as D
 
+
 class TestGrid:
     def test_no_direction(self):
         d = D.Empty
         assert d == False
-        
+
         assert d == 0
 
     def test_combo_directoins(self):
@@ -31,7 +32,6 @@ class TestGrid:
         for y in range(0, 3):
             for x in range(0, 2):
                 assert grid[x, y] == D.Empty, f"({x=}, {y=})"
-
 
     def test_index_out_of_bounds(self):
         grid = Grid(2, 3)
@@ -73,7 +73,6 @@ class TestGrid:
         assert grid[1, 1] == D.N | D.E
         assert grid[1, 0] == D.S
         assert grid[2, 1] == D.W
-    
 
     def test_link_edge(self):
         grid = Grid(3, 3)
@@ -83,3 +82,11 @@ class TestGrid:
 
         assert grid[0, 0] == D.Empty
         assert grid[1, 0] == D.Empty
+
+    def test_corners(self):
+        grid = Grid(4, 3)
+
+        assert grid.northwest_corner == (0, 0)
+        assert grid.northeast_corner == (3, 0)
+        assert grid.southwest_corner == (0, 2)
+        assert grid.souhteast_corner == (3, 2)

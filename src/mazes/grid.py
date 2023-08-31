@@ -5,6 +5,8 @@ from .direction import Direction, Coordinate
 
 
 class ImmutableGrid(Protocol):
+    # Abstract methods
+
     @property
     def width(self) -> int:
         ...
@@ -24,6 +26,24 @@ class ImmutableGrid(Protocol):
 
     def coordinates(self) -> Iterator[Coordinate]:
         ...
+
+    # Default implementations
+
+    @property
+    def northwest_corner(self) -> Coordinate:
+        return (0, 0)
+
+    @property
+    def northeast_corner(self) -> Coordinate:
+        return (self.width - 1, 0)
+
+    @property
+    def southwest_corner(self) -> Coordinate:
+        return (0, self.height - 1)
+
+    @property
+    def souhteast_corner(self) -> Coordinate:
+        return (self.width - 1, self.height - 1)
 
 
 class Grid(ImmutableGrid):
