@@ -10,7 +10,7 @@ class CommandError(Exception):
     pass
 
 
-class MazeCli:
+class CommandLine:
     def __init__(self) -> None:
         self.width = 5
         self.height = 5
@@ -88,6 +88,6 @@ class MazeCli:
         return seed
 
 
-def maze_cli() -> int:
-    cli = MazeCli()
+def main() -> int:
+    cli = CommandLine()
     return cli.execute()
