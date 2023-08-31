@@ -64,7 +64,7 @@ class TestGrid:
         assert grid[1, 1] == D.N
         assert grid[1, 0] == D.S
 
-    def test_link_multiple(self):
+    def test_link_multiple_individually(self):
         grid = Grid(3, 3)
 
         grid.link((1, 1), D.N)
@@ -73,6 +73,48 @@ class TestGrid:
         assert grid[1, 1] == D.N | D.E
         assert grid[1, 0] == D.S
         assert grid[2, 1] == D.W
+
+    def test_link_multiple_at_once(self):
+        grid = Grid(3, 3)
+
+        grid.link((1, 1), D.N | D.E)
+
+        assert grid[1, 1] == D.N | D.E
+        assert grid[1, 0] == D.S
+        assert grid[2, 1] == D.W
+
+    def test_link_short_path(self):
+        grid = Grid(3, 3)
+        coord = grid.link_path((0, 0), [D.E, D.S])
+
+        assert coord == (1, 1)
+        assert grid[0, 0] == D.E
+        assert grid[1, 0] == D.W | D.S
+        assert grid[1, 1] == D.N
+
+    def test_link_long_path(self):
+        grid = Grid(3, 3)
+        coord = grid.link_path((0, 0), [D.E, D.S, D.S, D.W, D.N, D.N])
+
+        #     0   1   2
+        #   +---+---+---+
+        # 0 |       |   |
+        #   +   +   +---+
+        # 1 |   |   |   |
+        #   +   +   +---+
+        # 2 |       |   |
+        #   +---+---+---+
+
+        assert coord == (0, 0)
+
+        assert grid[0, 0] == D.E | D.S
+        assert grid[1, 0] == D.W | D.S
+
+        assert grid[0, 1] == D.N | D.S
+        assert grid[1, 1] == D.N | D.S
+
+        assert grid[0, 2] == D.N | D.E
+        assert grid[1, 2] == D.N | D.W
 
     def test_link_edge(self):
         grid = Grid(3, 3)

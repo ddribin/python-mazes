@@ -9,7 +9,7 @@ Distance = int | None
 
 
 class Distances:
-    def __init__(self, width: int, height: int, root: Coordinate) -> None:
+    def __init__(self, width: int, height: int, root: Coordinate = (0, 0)) -> None:
         self._width = width
         self._height = height
         self._root = root

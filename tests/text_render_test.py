@@ -2,6 +2,7 @@ from mazes import Grid, Direction as D
 from mazes.renderers.text_renderer import TextRenderer
 from .asserts import *
 
+
 class TestTextRenderer:
     def test_empty_grid(self):
         grid = Grid(3, 3)
@@ -58,16 +59,11 @@ class TestTextRenderer:
 
     def test_link_path(self):
         grid = Grid(3, 3)
-        grid.link((0, 0), D.E)
-        grid.link((1, 0), D.E)
-        grid.link((2, 0), D.S)
-
-        grid.link((2, 1), D.W)
-        grid.link((1, 1), D.W)
-        grid.link((0, 1), D.S)
-        
-        grid.link((0, 2), D.E)
-        grid.link((1, 2), D.E)
+        path: list[D] = []
+        path.extend([D.E, D.E, D.S])  # 1st row
+        path.extend([D.W, D.W, D.S])  # 2nd row
+        path.extend([D.E, D.E])  # 3rd
+        grid.link_path((0, 0), path)
 
         text = self.render(grid)
 
