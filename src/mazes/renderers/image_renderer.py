@@ -15,23 +15,26 @@ class Mode(Enum):
 class ImageRenderer:
     @classmethod
     def render_grid_to_png_file(
-        cls, grid: ImmutableGrid, file_name: str, distances: Distances | None = None
+        cls,
+        grid: ImmutableGrid,
+        file_name: str,
+        distances: Distances | None = None,
+        max_distance=0,
     ) -> None:
-        renderer = ImageRenderer(grid, distances)
+        renderer = ImageRenderer(grid, distances, max_distance)
         renderer.render_png_file(file_name)
 
     def __init__(
         self,
         grid: ImmutableGrid,
         distances: Distances | None = None,
+        max_distance=0,
         cell_size=5,
         padding=5,
     ) -> None:
         self._grid = grid
         self._distances = distances
-        self._maximum = 0
-        if distances is not None:
-            _, self._maximum = distances.max
+        self._max_distance = max_distance
         self._cell_size = cell_size
         self._padding = padding
 
@@ -82,9 +85,9 @@ class ImageRenderer:
         distance = self._distances[coord]
         if distance is None:
             return None
-        if self._maximum == 0:
+        if self._max_distance == 0:
             return (255, 0, 0)
-        intensity = float(self._maximum - distance) / self._maximum
+        intensity = float(self._max_distance - distance) / self._max_distance
         dark = round(255 * intensity)
         bright = 128 + round(127 * intensity)
         return (dark, bright, bright)

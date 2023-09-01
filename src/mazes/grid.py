@@ -45,6 +45,11 @@ class ImmutableGrid(Protocol):
     def souhteast_corner(self) -> Coordinate:
         return (self.width - 1, self.height - 1)
 
+    @property
+    def center(self) -> Coordinate:
+        center = (int(self.width / 2), int(self.height / 2))
+        return center
+
 
 class Grid(ImmutableGrid):
     def __init__(self, width: int, height: int) -> None:
