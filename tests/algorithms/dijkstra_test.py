@@ -3,16 +3,14 @@ from itertools import chain
 from mazes.algorithms import Dijkstra
 from mazes.grid import Grid, ImmutableGrid, Direction as D
 from mazes.renderers import TextRenderer
+from mazes.distances import Distances
 
 from ..asserts import *
 
 
 class TestDijkstra:
-    def test_dijstra(self):
-        grid = self.make_grid()
-        dijkstra = Dijkstra(grid, (0, 0))
-
-        dijkstra.generate()
+    def test_distances(self):
+        dijkstra = self.generate_dijkstra()
 
         expected = [
             [0, 1, 2, 9],
@@ -21,13 +19,47 @@ class TestDijkstra:
             [7, 8, 7, 8],
         ]
 
-        distances = dijkstra.distances
-        for y in range(4):
-            for x in range(4):
-                assert distances[x, y] == expected[y][x], f"({x=}, {y=})"
+        assert_distances(dijkstra.distances, expected)
+
+    def test_max(self):
+        dijkstra = self.generate_dijkstra()
 
         assert dijkstra.max_distance == 9
         assert dijkstra.max_coordinate == (3, 0)
+
+    def test_path_to(self):
+        dijkstra = self.generate_dijkstra()
+
+        distances = dijkstra.path_to((3, 3))
+
+        N = None
+        expected = [
+            [0, 1, 2, N],
+            [N, 4, 3, N],
+            [N, 5, 6, N],
+            [N, N, 7, 8],
+        ]
+        assert_distances(distances, expected)
+
+    def test_longest_path(self):
+        dijkstra = self.generate_dijkstra()
+
+        distances = dijkstra.longest_path()
+
+        N = None
+        expected = [
+            [9, 8, 7, 0],
+            [N, 5, 6, 1],
+            [N, 4, 3, 2],
+            [N, N, N, N],
+        ]
+        assert_distances(distances, expected)
+
+    def generate_dijkstra(self) -> Dijkstra:
+        grid = self.make_grid()
+        dijkstra = Dijkstra(grid, (0, 0))
+        dijkstra.generate()
+        return dijkstra
 
     def make_grid(self) -> ImmutableGrid:
         grid = Grid(4, 4)
@@ -72,3 +104,9 @@ class TestDijkstra:
         assert_render(text, expected)
 
         return grid
+
+
+def assert_distances(distances: Distances, expected: list[list[int]]) -> None:
+    for y in range(distances.height):
+        for x in range(distances.width):
+            assert distances[x, y] == expected[y][x], f"({x=}, {y=})"

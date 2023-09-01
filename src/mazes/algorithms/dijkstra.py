@@ -1,6 +1,15 @@
+from collections.abc import Iterator
+from typing import TypeVar
+
 from ..distances import Distances
 from ..grid import ImmutableGrid, Coordinate
-from collections.abc import Iterator
+
+T = TypeVar("T")
+
+
+def unwrap(x: T | None) -> T:
+    assert x is not None
+    return x
 
 
 class Dijkstra:
@@ -25,6 +34,39 @@ class Dijkstra:
 
     def steps(self) -> Iterator[None]:
         yield
+
+    def path_to(self, goal: Coordinate) -> Distances:
+        start = self._root
+        current = goal
+        grid = self._grid
+        distances = self._distances
+
+        breadcrumbs = Distances(self._grid.width, self._grid.height, start)
+        breadcrumbs[current] = unwrap(distances[current])
+
+        while current != start:
+            links = unwrap(grid[current])
+            current_distance = unwrap(distances[current])
+
+            for dir in links:
+                neighbor = dir.update_coordinate(current)
+                neighbor_distance = unwrap(distances[neighbor])
+                if neighbor_distance < current_distance:
+                    breadcrumbs[neighbor] = neighbor_distance
+                    current = neighbor
+                    break
+
+        return breadcrumbs
+
+    def longest_path(self) -> Distances:
+        new_root = self.max_coordinate
+
+        new_dijkstra = Dijkstra(self._grid, new_root)
+        new_dijkstra.generate()
+        goal = new_dijkstra.max_coordinate
+
+        path = new_dijkstra.path_to(goal)
+        return path
 
     def generate(self) -> None:
         distances = self._distances
