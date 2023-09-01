@@ -1,6 +1,7 @@
 from collections.abc import Iterator
 
-from ..grid import Grid, Direction
+from ..grid import Grid
+from ..direction import Direction
 from .utils import sample
 from .algorithm import Algorithm
 
@@ -23,10 +24,11 @@ class BinaryTree(Algorithm):
         for coord in grid.coordinates():
             x, y = coord
             neighbors: list[Direction] = []
-            if y > 0:
-                neighbors.append(Direction.N)
-            if x < width - 1:
-                neighbors.append(Direction.E)
+            valid_dirs = grid.valid_directions(coord)
+            if Direction.N in valid_dirs:
+                neighbors.append(Direction.N)  # type: ignore
+            if Direction.E in valid_dirs:
+                neighbors.append(Direction.E)  # type: ignore
 
             if len(neighbors) != 0:
                 neighbor = random.choose_direction(neighbors)

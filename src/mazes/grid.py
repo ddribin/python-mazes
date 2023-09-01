@@ -15,9 +15,6 @@ class ImmutableGrid(Protocol):
     def height(self) -> int:
         ...
 
-    def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
-        ...
-
     def __getitem__(self, index: Coordinate) -> Direction | None:
         ...
 
@@ -28,6 +25,28 @@ class ImmutableGrid(Protocol):
         ...
 
     # Default implementations
+
+    def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
+        x, y = coordinate
+        if x not in range(self.width):
+            return False
+        if y not in range(self.height):
+            return False
+        return True
+
+    def valid_directions(self, coordinate: Coordinate) -> Direction:
+        x, y = coordinate
+        valid_directions = Direction.Empty
+        if y > 0:
+            valid_directions |= Direction.N
+        if y < self.height - 1:
+            valid_directions |= Direction.S
+        if x > 0:
+            valid_directions |= Direction.W
+        if x < self.width - 1:
+            valid_directions |= Direction.E
+
+        return valid_directions
 
     @property
     def northwest_corner(self) -> Coordinate:
@@ -42,7 +61,7 @@ class ImmutableGrid(Protocol):
         return (0, self.height - 1)
 
     @property
-    def souhteast_corner(self) -> Coordinate:
+    def southeast_corner(self) -> Coordinate:
         return (self.width - 1, self.height - 1)
 
     @property
@@ -69,14 +88,6 @@ class Grid(ImmutableGrid):
     @property
     def height(self) -> int:
         return self._height
-
-    def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
-        x, y = coordinate
-        if x not in range(self._width):
-            return False
-        if y not in range(self._height):
-            return False
-        return True
 
     def __getitem__(self, index: Coordinate) -> Direction | None:
         if self.is_valid_coordinate(index):

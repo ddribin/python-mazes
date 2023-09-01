@@ -3,7 +3,6 @@ from itertools import chain
 from mazes.algorithms import Dijkstra
 from mazes.grid import Grid, ImmutableGrid, Direction as D
 from mazes.renderers import TextRenderer
-from mazes.distances import Distances
 
 from ..asserts import *
 
@@ -104,9 +103,3 @@ class TestDijkstra:
         assert_render(text, expected)
 
         return grid
-
-
-def assert_distances(distances: Distances, expected: list[list[int]]) -> None:
-    for y in range(distances.height):
-        for x in range(distances.width):
-            assert distances[x, y] == expected[y][x], f"({x=}, {y=})"

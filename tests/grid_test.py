@@ -131,4 +131,20 @@ class TestGrid:
         assert grid.northwest_corner == (0, 0)
         assert grid.northeast_corner == (3, 0)
         assert grid.southwest_corner == (0, 2)
-        assert grid.souhteast_corner == (3, 2)
+        assert grid.southeast_corner == (3, 2)
+
+    def test_center(self):
+        grid_3x3 = Grid(3, 3)
+        grid_4x4 = Grid(4, 4)
+
+        assert grid_3x3.center == (1, 1)
+        assert grid_4x4.center == (2, 2)
+
+    def test_has_direction(self):
+        grid = Grid(3, 3)
+
+        assert grid.valid_directions(grid.northwest_corner) == D.E | D.S
+        assert grid.valid_directions(grid.northeast_corner) == D.W | D.S
+        assert grid.valid_directions(grid.southwest_corner) == D.E | D.N
+        assert grid.valid_directions(grid.southeast_corner) == D.W | D.N
+        assert grid.valid_directions(grid.center) == D.N | D.S | D.E | D.W

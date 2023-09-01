@@ -3,13 +3,7 @@ from typing import TypeVar
 
 from ..distances import Distances
 from ..grid import ImmutableGrid, Coordinate
-
-T = TypeVar("T")
-
-
-def unwrap(x: T | None) -> T:
-    assert x is not None
-    return x
+from .utils import *
 
 
 class Dijkstra:

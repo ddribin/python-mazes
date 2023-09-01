@@ -2,6 +2,15 @@ from typing_extensions import Protocol
 from collections.abc import Iterator
 
 
+def next_step(step_iterator: Iterator[None]) -> bool:
+    has_more = True
+    try:
+        next(step_iterator)
+    except StopIteration:
+        has_more = False
+    return has_more
+
+
 class Algorithm(Protocol):
     def steps(self) -> Iterator[None]:
         """
