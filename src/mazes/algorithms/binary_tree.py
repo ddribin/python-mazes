@@ -7,8 +7,8 @@ from .algorithm import Algorithm
 
 
 class BinaryTreeRandom:
-    def choose_direction(self, directions: list[Direction]) -> Direction:
-        return sample(directions)
+    def choose_direction(self, directions: Direction) -> Direction:
+        return sample(list(directions))
 
 
 class BinaryTree(Algorithm):
@@ -23,14 +23,14 @@ class BinaryTree(Algorithm):
 
         for coord in grid.coordinates():
             x, y = coord
-            neighbors: list[Direction] = []
+            neighbors = Direction.Empty
             valid_dirs = grid.valid_directions(coord)
             if Direction.N in valid_dirs:
-                neighbors.append(Direction.N)  # type: ignore
+                neighbors |= Direction.N
             if Direction.E in valid_dirs:
-                neighbors.append(Direction.E)  # type: ignore
+                neighbors |= Direction.E
 
-            if len(neighbors) != 0:
+            if neighbors != Direction.Empty:
                 neighbor = random.choose_direction(neighbors)
                 grid.link(coord, neighbor)
 

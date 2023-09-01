@@ -10,7 +10,7 @@ class FakeBinaryTreeRandom(BinaryTreeRandom):
         self._fakes = fakes
         self._index = 0
 
-    def choose_direction(self, directions: list[D]) -> D:
+    def choose_direction(self, directions: D) -> D:
         direction = self._fakes[self._index]
         self._index += 1
         return direction
