@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from collections.abc import Iterator
 
 from .direction import Direction, Coordinate
@@ -9,12 +7,10 @@ Distance = int | None
 
 
 class Distances:
-    def __init__(self, width: int, height: int, root: Coordinate = (0, 0)) -> None:
+    def __init__(self, width: int, height: int) -> None:
         self._width = width
         self._height = height
-        self._root = root
         self._grid = self._prepare_grid()
-        self._max = ((0, 0), 0)
 
     def _prepare_grid(self) -> list[list[Distance]]:
         row: list[Distance] = [None] * self._width
@@ -57,58 +53,3 @@ class Distances:
         for y in range(self._height):
             for x in range(self._width):
                 yield (x, y)
-
-    def _set_max(self, coordinate: Coordinate, distance: int) -> None:
-        self._max = (coordinate, distance)
-
-    @property
-    def max(self) -> tuple[Coordinate, int]:
-        return self._max
-
-    @property
-    def max_(self) -> tuple[Coordinate, int]:
-        max_distance = 0
-        max_coord = self._root
-
-        for coord in self.coordinates():
-            distance = self[coord]
-            if distance is not None and distance > max_distance:
-                max_coord = coord
-                max_distance = distance
-
-        return (max_coord, max_distance)
-
-    @classmethod
-    def from_root(cls, grid: ImmutableGrid, root: Coordinate) -> Distances:
-        distances = Distances(grid.width, grid.height, root)
-        distances[root] = 0
-        frontier = [root]
-        max_coord = root
-        max_distance = 0
-
-        while frontier:
-            new_frontier: list[Coordinate] = []
-
-            for current in frontier:
-                linked = grid[current]
-                if linked is not None:
-                    distance = distances[current]
-                    assert distance is not None
-
-                    for direction in linked:
-                        next_coord = direction.update_coordinate(current)
-                        next_distance = distances[next_coord]
-                        if next_distance is not None:
-                            continue
-                        next_distance = distance + 1
-                        distances[next_coord] = next_distance
-                        new_frontier.append(next_coord)
-                        if next_distance > max_distance:
-                            max_coord = next_coord
-                            max_distance = next_distance
-
-            frontier = new_frontier
-
-        distances._set_max(max_coord, max_distance)
-
-        return distances

@@ -8,16 +8,6 @@ from .grid import Grid, ImmutableGrid, Coordinate
 from .renderers import TextRenderer, ImageRenderer
 
 
-from typing import TypeVar, Sequence
-
-T = TypeVar("T")
-
-
-def unwrap(x: T | None) -> T:
-    assert x is not None
-    return x
-
-
 class Maze:
     class AlgorithmType(Enum):
         BinaryTree = auto()

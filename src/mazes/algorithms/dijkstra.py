@@ -41,7 +41,7 @@ class Dijkstra:
         grid = self._grid
         distances = self._distances
 
-        breadcrumbs = Distances(self._grid.width, self._grid.height, start)
+        breadcrumbs = Distances(self._grid.width, self._grid.height)
         breadcrumbs[current] = unwrap(distances[current])
 
         while current != start:

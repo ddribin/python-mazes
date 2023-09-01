@@ -59,7 +59,7 @@ class TestTextRenderer:
 
     def test_link_path(self):
         grid = Grid(3, 3)
-        path: list[D] = []
+        path = []
         path.extend([D.E, D.E, D.S])  # 1st row
         path.extend([D.W, D.W, D.S])  # 2nd row
         path.extend([D.E, D.E])  # 3rd

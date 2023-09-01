@@ -7,7 +7,6 @@ class TestDistances:
 
         assert distances.width == 3
         assert distances.height == 4
-        assert distances.max == ((0, 0), 0)
 
         for y in range(4):
             for x in range(3):
