@@ -33,6 +33,7 @@ class TestSidewinder:
 
         text = self.render_grid(grid, should_close_out)
 
+        # Random seed of 5402118375022309858!!
         expected = """
             +---+---+---+
             |           |
