@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum, auto
 
-from .algorithms import Algorithm, BinaryTree, Dijkstra
+from .algorithms import Algorithm, BinaryTree, Sidewinder, Dijkstra
 from .distances import Distances
 from .grid import Grid, ImmutableGrid, Coordinate
 from .renderers import TextRenderer, ImageRenderer
@@ -11,6 +11,7 @@ from .renderers import TextRenderer, ImageRenderer
 class Maze:
     class AlgorithmType(Enum):
         BinaryTree = auto()
+        Sidewinder = auto()
 
     class OverlayType(Enum):
         Nothing = auto()
@@ -38,9 +39,10 @@ class Maze:
         match mazeType:
             case Maze.AlgorithmType.BinaryTree:
                 return BinaryTree(grid)
-
+            case Maze.AlgorithmType.Sidewinder:
+                return Sidewinder(grid)
             case _:
-                return BinaryTree(grid)
+                raise ValueError(mazeType)
 
     def __init__(self, grid: ImmutableGrid, overlayType: Maze.OverlayType) -> None:
         self._grid = grid

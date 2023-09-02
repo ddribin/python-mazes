@@ -1,5 +1,3 @@
-from itertools import chain
-
 from mazes.algorithms import Dijkstra
 from mazes.grid import Grid, ImmutableGrid, Direction as D
 from mazes.renderers import TextRenderer

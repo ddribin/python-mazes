@@ -17,6 +17,7 @@ class CommandLine:
         self.seed: int | None = None
         self.output: str | None = None
         self.overlay_type: str | None = None
+        self.algorithm = "binary_tree"
 
     def execute(self) -> int:
         try:
@@ -37,6 +38,10 @@ class CommandLine:
         parser.add_argument(
             "-o", "--output", type=str, help="Output file. Supports .txt and .png."
         )
+        algorithms = ["binary-tree", "sidewinder"]
+        parser.add_argument(
+            "-a", "--algorithm", choices=algorithms, default="binary-tree"
+        )
         parser.add_argument(
             "-O", "--overlay", choices=["none", "distance", "path", "longest"]
         )
@@ -48,6 +53,7 @@ class CommandLine:
         self.seed = args.seed
         self.output = args.output
         self.overlay_type = args.overlay
+        self.algorithm = args.algorithm
 
     def run(self) -> None:
         seed = self.setup_seed()
@@ -56,21 +62,35 @@ class CommandLine:
         print(f"Seed: {seed}")
 
     def generate_maze(self) -> Maze:
-        overlayType: Maze.OverlayType
-        match self.overlay_type:
-            case "distance":
-                overlayType = Maze.OverlayType.Distance
-            case "path":
-                overlayType = Maze.OverlayType.PathTo
-            case "longest":
-                overlayType = Maze.OverlayType.LongestPath
-            case _:
-                overlayType = Maze.OverlayType.Nothing
-
         maze = Maze.generate(
-            self.width, self.height, Maze.AlgorithmType.BinaryTree, overlayType
+            self.width,
+            self.height,
+            self.maze_algorithm_type(),
+            self.maze_overlay_type(),
         )
         return maze
+
+    def maze_overlay_type(self) -> Maze.OverlayType:
+        match self.overlay_type:
+            case "distance":
+                return Maze.OverlayType.Distance
+            case "path":
+                return Maze.OverlayType.PathTo
+            case "longest":
+                return Maze.OverlayType.LongestPath
+            case None:
+                return Maze.OverlayType.Nothing
+            case _:
+                raise ValueError(self.overlay_type)
+
+    def maze_algorithm_type(self) -> Maze.AlgorithmType:
+        match self.algorithm:
+            case "binary-tree":
+                return Maze.AlgorithmType.BinaryTree
+            case "sidewinder":
+                return Maze.AlgorithmType.Sidewinder
+            case _:
+                raise ValueError(self.algorithm)
 
     def output_maze(self, maze: Maze) -> None:
         output = self.output
