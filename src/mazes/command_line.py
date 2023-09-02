@@ -43,7 +43,7 @@ class CommandLine:
             "-a", "--algorithm", choices=algorithms, default="binary-tree"
         )
         parser.add_argument(
-            "-O", "--overlay", choices=["none", "distance", "path", "longest"]
+            "-O", "--overlay", choices=["none", "distance", "path", "max", "longest"]
         )
 
         args = parser.parse_args()
@@ -76,6 +76,8 @@ class CommandLine:
                 return Maze.OverlayType.Distance
             case "path":
                 return Maze.OverlayType.PathTo
+            case "max":
+                return Maze.OverlayType.PathToMax
             case "longest":
                 return Maze.OverlayType.LongestPath
             case None:

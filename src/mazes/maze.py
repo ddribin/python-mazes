@@ -17,6 +17,7 @@ class Maze:
         Nothing = auto()
         Distance = auto()
         PathTo = auto()
+        PathToMax = auto()
         LongestPath = auto()
 
     @classmethod
@@ -80,11 +81,18 @@ class Maze:
                 goal = self._grid.southwest_corner
                 return self._dijkstra.path_to(goal)
 
+            case Maze.OverlayType.PathToMax:
+                goal = self._dijkstra.max_coordinate
+                return self._dijkstra.path_to(goal)
+
             case Maze.OverlayType.LongestPath:
                 return self._dijkstra.longest_path()
 
-            case _:
+            case Maze.OverlayType.Nothing:
                 return None
+
+            case _:
+                raise ValueError(self._overlayType)
 
     def max_distance(self) -> int:
         if self._overlayType == Maze.OverlayType.Distance:
