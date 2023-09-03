@@ -26,6 +26,12 @@ class Direction(IntFlag):
             case _:
                 return self
 
+    @property
+    def invert(self) -> Direction:
+        # Needed to satisfy type checking
+        inverted = ~self
+        return Direction(inverted)
+
     def update_coordinate(self, coordinate: Coordinate) -> Coordinate:
         x, y = coordinate
         if Direction.N in self:

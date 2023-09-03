@@ -69,6 +69,11 @@ class ImmutableGrid(Protocol):
         center = (int(self.width / 2), int(self.height / 2))
         return center
 
+    def __str__(self) -> str:
+        from .renderers import TextRenderer
+
+        return TextRenderer.render_grid(self)
+
 
 class Grid(ImmutableGrid):
     def __init__(self, width: int, height: int) -> None:

@@ -38,7 +38,7 @@ class CommandLine:
         parser.add_argument(
             "-o", "--output", type=str, help="Output file. Supports .txt and .png."
         )
-        algorithms = ["binary-tree", "sidewinder"]
+        algorithms = ["binary-tree", "sidewinder", "recursive-backtracker"]
         parser.add_argument(
             "-a", "--algorithm", choices=algorithms, default="binary-tree"
         )
@@ -82,8 +82,8 @@ class CommandLine:
                 return Maze.OverlayType.LongestPath
             case None:
                 return Maze.OverlayType.Nothing
-            case _:
-                raise ValueError(self.overlay_type)
+            case unknown:
+                raise ValueError(unknown)
 
     def maze_algorithm_type(self) -> Maze.AlgorithmType:
         match self.algorithm:
@@ -91,8 +91,10 @@ class CommandLine:
                 return Maze.AlgorithmType.BinaryTree
             case "sidewinder":
                 return Maze.AlgorithmType.Sidewinder
-            case _:
-                raise ValueError(self.algorithm)
+            case "recursive-backtracker":
+                return Maze.AlgorithmType.RecursiveBacktracker
+            case unknown:
+                raise ValueError(unknown)
 
     def output_maze(self, maze: Maze) -> None:
         output = self.output

@@ -1,5 +1,3 @@
-from itertools import chain
-
 from mazes.algorithms import Sidewinder, SidewinderRandom
 from mazes.algorithms.utils import flatten
 from mazes.grid import Grid, Coordinate

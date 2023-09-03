@@ -1,5 +1,6 @@
 from mazes import Direction as D, Coordinate
 
+
 class TestDirection:
     def test_opposite_directions(self):
         assert D.N.opposite() == D.S
@@ -15,3 +16,9 @@ class TestDirection:
 
         dir = D.N | D.W
         assert dir.update_coordinate((2, 2)) == (1, 1)
+
+    def test_invert(self):
+        assert D.Empty.invert == (D.N | D.S | D.E | D.W)
+        assert (D.N | D.S | D.E | D.W).invert == D.Empty
+        assert D.N.invert == (D.S | D.E | D.W)
+        assert (D.S | D.E | D.W).invert == D.N

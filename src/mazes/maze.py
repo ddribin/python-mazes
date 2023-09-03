@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from enum import Enum, auto
 
-from .algorithms import Algorithm, BinaryTree, Sidewinder, Dijkstra
+from .algorithms import (
+    Algorithm,
+    BinaryTree,
+    Sidewinder,
+    RecursiveBacktracker,
+    Dijkstra,
+)
 from .distances import Distances
 from .grid import Grid, ImmutableGrid, Coordinate
 from .renderers import TextRenderer, ImageRenderer
@@ -12,6 +18,7 @@ class Maze:
     class AlgorithmType(Enum):
         BinaryTree = auto()
         Sidewinder = auto()
+        RecursiveBacktracker = auto()
 
     class OverlayType(Enum):
         Nothing = auto()
@@ -42,8 +49,10 @@ class Maze:
                 return BinaryTree(grid)
             case Maze.AlgorithmType.Sidewinder:
                 return Sidewinder(grid)
-            case _:
-                raise ValueError(mazeType)
+            case Maze.AlgorithmType.RecursiveBacktracker:
+                return RecursiveBacktracker(grid)
+            case unknown:
+                raise ValueError(unknown)
 
     def __init__(self, grid: ImmutableGrid, overlayType: Maze.OverlayType) -> None:
         self._grid = grid
@@ -78,7 +87,7 @@ class Maze:
                 return self._dijkstra.distances
 
             case Maze.OverlayType.PathTo:
-                goal = self._grid.southwest_corner
+                goal = self._grid.southeast_corner
                 return self._dijkstra.path_to(goal)
 
             case Maze.OverlayType.PathToMax:
@@ -91,8 +100,8 @@ class Maze:
             case Maze.OverlayType.Nothing:
                 return None
 
-            case _:
-                raise ValueError(self._overlayType)
+            case unknown:
+                raise ValueError(unknown)
 
     def max_distance(self) -> int:
         if self._overlayType == Maze.OverlayType.Distance:
