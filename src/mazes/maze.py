@@ -11,7 +11,7 @@ from .algorithms import (
 )
 from .distances import Distances
 from .grid import Coordinate, Grid, ImmutableGrid
-from .renderers import ImageRenderer, TextRenderer
+from .renderers import Color, ImageRenderer, TextRenderer
 
 
 class Maze:
@@ -103,11 +103,11 @@ class Maze:
             case unknown:
                 raise ValueError(unknown)
 
-    def max_distance(self) -> int:
+    def gradient(self) -> tuple[Color, Color]:
         if self._overlayType == Maze.OverlayType.Distance:
-            return self._dijkstra.distances.max_distance
+            return ((255, 255, 255), (0, 128, 128))
         else:
-            return 0
+            return ((255, 0, 0), (0, 255, 0))
 
     def __str__(self) -> str:
         renderer = TextRenderer(self._grid, self.distances())
@@ -115,5 +115,9 @@ class Maze:
         return text
 
     def write_png(self, file_name: str) -> None:
-        renderer = ImageRenderer(self._grid, self.distances(), self.max_distance())
+        print(self.distances())
+        gradient_start, gradient_end = self.gradient()
+        renderer = ImageRenderer(
+            self._grid, self.distances(), gradient_start, gradient_end
+        )
         renderer.render_png_file(file_name)

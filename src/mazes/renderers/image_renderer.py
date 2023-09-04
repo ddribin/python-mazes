@@ -14,28 +14,19 @@ class Mode(Enum):
 
 
 class ImageRenderer:
-    @classmethod
-    def render_grid_to_png_file(
-        cls,
-        grid: ImmutableGrid,
-        file_name: str,
-        distances: Distances | None = None,
-        max_distance=0,
-    ) -> None:
-        renderer = ImageRenderer(grid, distances, max_distance)
-        renderer.render_png_file(file_name)
-
     def __init__(
         self,
         grid: ImmutableGrid,
         distances: Distances | None = None,
-        max_distance=0,
+        gradient_start: Color = (255, 255, 255),
+        gradient_end: Color = (0, 128, 128),
         cell_size=5,
         padding=5,
     ) -> None:
         self._grid = grid
         self._distances = distances
-        self._max_distance = max_distance
+        self._gradient_start = gradient_start
+        self._gradient_end = gradient_end
         self._cell_size = cell_size
         self._padding = padding
 
@@ -86,9 +77,13 @@ class ImageRenderer:
         distance = self._distances[coord]
         if distance is None:
             return None
-        if self._max_distance == 0:
-            return (255, 0, 0)
-        intensity = float(self._max_distance - distance) / self._max_distance
-        dark = round(255 * intensity)
-        bright = 128 + round(127 * intensity)
-        return (dark, bright, bright)
+        max_distance = self._distances.max_distance
+        intensity = float(max_distance - distance) / max_distance
+        # r1, g1, b1 = (255, 0, 0)
+        # r2, g2, b2 = (0, 255, 0)
+        r1, g1, b1 = self._gradient_end
+        r2, g2, b2 = self._gradient_start
+        r = round((r1 - r2) * intensity) + r2
+        g = round((g1 - g2) * intensity) + g2
+        b = round((b1 - b2) * intensity) + b2
+        return (r, g, b)
