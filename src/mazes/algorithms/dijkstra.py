@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from collections.abc import Iterator
-from typing import TypeVar
 
 from ..distances import Distances
 from ..grid import Coordinate, ImmutableGrid
@@ -9,26 +10,15 @@ from .utils import *
 class Dijkstra:
     def __init__(self, grid: ImmutableGrid, root: Coordinate) -> None:
         self._grid = grid
-        self._distances = Distances(grid.width, grid.height)
-        self._root = root
-        self._max_distance = 0
-        self._max_coordinate = root
+        self._distances = Distances(grid.width, grid.height, root)
 
     @property
     def distances(self) -> Distances:
         return self._distances
 
-    @property
-    def max_distance(self) -> int:
-        return self._max_distance
-
-    @property
-    def max_coordinate(self) -> Coordinate:
-        return self._max_coordinate
-
     def steps(self) -> Iterator[None]:
         distances = self._distances
-        root = self._root
+        root = distances.root
         grid = self._grid
 
         distances[root] = 0
@@ -68,12 +58,12 @@ class Dijkstra:
             pass
 
     def path_to(self, goal: Coordinate) -> Distances:
-        start = self._root
+        distances = self._distances
+        start = distances.root
         current = goal
         grid = self._grid
-        distances = self._distances
 
-        breadcrumbs = Distances(self._grid.width, self._grid.height)
+        breadcrumbs = Distances(self._grid.width, self._grid.height, start)
         breadcrumbs[current] = unwrap(distances[current])
 
         while current != start:
@@ -91,11 +81,11 @@ class Dijkstra:
         return breadcrumbs
 
     def longest_path(self) -> Distances:
-        new_root = self.max_coordinate
+        new_root = self._distances.max_coordinate
 
         new_dijkstra = Dijkstra(self._grid, new_root)
         new_dijkstra.generate()
-        goal = new_dijkstra.max_coordinate
+        goal = new_dijkstra._distances.max_coordinate
 
         path = new_dijkstra.path_to(goal)
         return path

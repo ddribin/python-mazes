@@ -9,6 +9,7 @@ from ..asserts import *
 class TestDijkstra:
     def test_distances(self):
         dijkstra = self.generate_dijkstra()
+        distances = dijkstra.distances
 
         expected = [
             [0, 1, 2, 9],
@@ -17,13 +18,10 @@ class TestDijkstra:
             [7, 8, 7, 8],
         ]
 
-        assert_distances(dijkstra.distances, expected)
-
-    def test_max(self):
-        dijkstra = self.generate_dijkstra()
-
-        assert dijkstra.max_distance == 9
-        assert dijkstra.max_coordinate == (3, 0)
+        assert_distances(distances, expected)
+        assert distances.root == (0, 0)
+        assert distances.max_coordinate == (3, 0)
+        assert distances.max_distance == 9
 
     def test_path_to(self):
         dijkstra = self.generate_dijkstra()
@@ -38,6 +36,9 @@ class TestDijkstra:
             [N, N, 7, 8],
         ]
         assert_distances(distances, expected)
+        assert distances.root == (0, 0)
+        assert distances.max_coordinate == (3, 3)
+        assert distances.max_distance == 8
 
     def test_longest_path(self):
         dijkstra = self.generate_dijkstra()
@@ -52,6 +53,9 @@ class TestDijkstra:
             [N, N, N, N],
         ]
         assert_distances(distances, expected)
+        assert distances.root == (3, 0)
+        assert distances.max_distance == 9
+        assert distances.max_coordinate == (0, 0)
 
     def generate_dijkstra(self) -> Dijkstra:
         grid = self.make_grid()
