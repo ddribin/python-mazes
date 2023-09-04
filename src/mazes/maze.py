@@ -91,7 +91,7 @@ class Maze:
                 return self._dijkstra.path_to(goal)
 
             case Maze.OverlayType.PathToMax:
-                goal = self._dijkstra.max_coordinate
+                goal = self._dijkstra.distances.max_coordinate
                 return self._dijkstra.path_to(goal)
 
             case Maze.OverlayType.LongestPath:
@@ -105,7 +105,7 @@ class Maze:
 
     def max_distance(self) -> int:
         if self._overlayType == Maze.OverlayType.Distance:
-            return self._dijkstra.max_distance
+            return self._dijkstra.distances.max_distance
         else:
             return 0
 
