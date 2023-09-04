@@ -1,14 +1,14 @@
 from collections.abc import Iterator
+import random
 
 from ..grid import Grid
 from ..direction import Direction
-from .utils import sample
 from .algorithm import Algorithm
 
 
 class BinaryTreeRandom:
     def choose_direction(self, directions: Direction) -> Direction:
-        return sample(list(directions))
+        return random.choice(list(directions))
 
 
 class BinaryTree(Algorithm):

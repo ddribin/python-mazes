@@ -2,7 +2,6 @@ from collections.abc import Iterator
 import random
 
 from .algorithm import Algorithm
-from .utils import sample
 
 from ..grid import Grid, Coordinate
 from ..direction import Direction
@@ -13,7 +12,7 @@ class SidewinderRandom:
         return random.randint(0, 1) == 1
 
     def choose_north(self, coords: list[Coordinate]) -> Coordinate:
-        return sample(coords)
+        return random.choice(coords)
 
 
 class Sidewinder(Algorithm):
