@@ -2,7 +2,7 @@ from collections.abc import Iterator
 from typing import TypeVar
 
 from ..distances import Distances
-from ..grid import ImmutableGrid, Coordinate
+from ..grid import Coordinate, ImmutableGrid
 from .utils import *
 
 

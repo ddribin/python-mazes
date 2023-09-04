@@ -1,7 +1,8 @@
 from collections.abc import Iterator
+
 from typing_extensions import Protocol
 
-from .direction import Direction, Coordinate
+from .direction import Coordinate, Direction
 
 
 class ImmutableGrid(Protocol):

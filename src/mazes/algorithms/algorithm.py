@@ -1,5 +1,6 @@
-from typing_extensions import Protocol
 from collections.abc import Iterator
+
+from typing_extensions import Protocol
 
 
 def next_step(step_iterator: Iterator[None]) -> bool:

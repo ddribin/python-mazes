@@ -1,6 +1,6 @@
 import random
-from typing import TypeVar, Sequence
 from itertools import chain
+from typing import Sequence, TypeVar
 
 T = TypeVar("T")
 

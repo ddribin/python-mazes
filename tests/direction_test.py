@@ -1,4 +1,5 @@
-from mazes import Direction as D, Coordinate
+from mazes import Coordinate
+from mazes import Direction as D
 
 
 class TestDirection:

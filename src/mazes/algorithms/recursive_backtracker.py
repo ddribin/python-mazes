@@ -1,11 +1,10 @@
-from collections.abc import Iterator
 import random
+from collections.abc import Iterator
 
+from ..direction import Direction
+from ..grid import Coordinate, Grid
 from .algorithm import Algorithm
 from .utils import unwrap
-
-from ..grid import Grid, Coordinate
-from ..direction import Direction
 
 
 class RecursiveBacktrackerRandom:

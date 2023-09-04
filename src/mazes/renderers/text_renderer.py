@@ -1,5 +1,5 @@
-from ..grid import ImmutableGrid, Direction, Coordinate
 from ..distances import Distances
+from ..grid import Coordinate, Direction, ImmutableGrid
 
 
 class TextRenderer:

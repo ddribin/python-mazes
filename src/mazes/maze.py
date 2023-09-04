@@ -5,13 +5,13 @@ from enum import Enum, auto
 from .algorithms import (
     Algorithm,
     BinaryTree,
-    Sidewinder,
-    RecursiveBacktracker,
     Dijkstra,
+    RecursiveBacktracker,
+    Sidewinder,
 )
 from .distances import Distances
-from .grid import Grid, ImmutableGrid, Coordinate
-from .renderers import TextRenderer, ImageRenderer
+from .grid import Coordinate, Grid, ImmutableGrid
+from .renderers import ImageRenderer, TextRenderer
 
 
 class Maze:

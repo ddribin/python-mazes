@@ -1,7 +1,7 @@
 from mazes.algorithms import RecursiveBacktracker, RecursiveBacktrackerRandom
 from mazes.algorithms.utils import flatten
 from mazes.direction import Direction as D
-from mazes.grid import Grid, Coordinate
+from mazes.grid import Coordinate, Grid
 from mazes.renderers import TextRenderer
 
 from ..asserts import *

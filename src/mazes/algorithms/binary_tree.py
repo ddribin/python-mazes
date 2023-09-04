@@ -1,8 +1,8 @@
-from collections.abc import Iterator
 import random
+from collections.abc import Iterator
 
-from ..grid import Grid
 from ..direction import Direction
+from ..grid import Grid
 from .algorithm import Algorithm
 
 

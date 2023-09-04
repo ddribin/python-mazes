@@ -1,4 +1,5 @@
-from mazes import Grid, Direction as D
+from mazes import Direction as D
+from mazes import Grid
 
 
 class TestGrid:

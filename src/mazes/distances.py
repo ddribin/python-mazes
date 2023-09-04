@@ -1,6 +1,6 @@
 from collections.abc import Iterator
 
-from .direction import Direction, Coordinate
+from .direction import Coordinate, Direction
 from .grid import ImmutableGrid
 
 Distance = int | None

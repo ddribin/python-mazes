@@ -1,8 +1,9 @@
-from PIL import Image, ImageDraw
 from enum import Enum, auto
 
-from ..grid import ImmutableGrid, Direction, Coordinate
+from PIL import Image, ImageDraw
+
 from ..distances import Distances
+from ..grid import Coordinate, Direction, ImmutableGrid
 
 Color = tuple[int, int, int]
 

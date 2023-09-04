@@ -1,5 +1,6 @@
 from mazes.algorithms import Dijkstra
-from mazes.grid import Grid, ImmutableGrid, Direction as D
+from mazes.grid import Direction as D
+from mazes.grid import Grid, ImmutableGrid
 from mazes.renderers import TextRenderer
 
 from ..asserts import *
