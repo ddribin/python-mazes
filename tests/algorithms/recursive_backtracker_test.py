@@ -44,8 +44,6 @@ class TestRecursiveBacktracker:
             |           |   |
             +---+---+---+---+
             """
-        print(text)
-        print(expected)
         assert_render(text, expected)
 
     def render_grid(self, grid: Grid, start: Coordinate, directions: list[D]) -> str:

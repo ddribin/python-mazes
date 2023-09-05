@@ -115,7 +115,6 @@ class Maze:
         return text
 
     def write_png(self, file_name: str) -> None:
-        print(self.distances())
         gradient_start, gradient_end = self.gradient()
         renderer = ImageRenderer(
             self._grid, self.distances(), gradient_start, gradient_end
