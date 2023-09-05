@@ -1,6 +1,5 @@
-import random
 from itertools import chain
-from typing import Sequence, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -10,5 +9,5 @@ def unwrap(x: T | None) -> T:
     return x
 
 
-def flatten(l: list[list[T]]) -> list[T]:
-    return list(chain.from_iterable(l))
+def flatten(lst: list[list[T]]) -> list[T]:
+    return list(chain.from_iterable(lst))

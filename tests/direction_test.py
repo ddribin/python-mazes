@@ -1,4 +1,3 @@
-from mazes import Coordinate
 from mazes import Direction as D
 
 

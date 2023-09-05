@@ -3,7 +3,7 @@ from mazes.grid import Direction as D
 from mazes.grid import Grid
 from mazes.renderers.text_renderer import TextRenderer
 
-from ..asserts import *
+from ..asserts import assert_render
 
 
 class FakeBinaryTreeRandom(BinaryTreeRandom):

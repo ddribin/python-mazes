@@ -2,7 +2,7 @@ from mazes import Direction as D
 from mazes import Grid
 from mazes.renderers.text_renderer import TextRenderer
 
-from .asserts import *
+from .asserts import assert_render
 
 
 class TestTextRenderer:

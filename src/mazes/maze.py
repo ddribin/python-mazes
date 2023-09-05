@@ -10,7 +10,7 @@ from .algorithms import (
     Sidewinder,
 )
 from .distances import Distances
-from .grid import Coordinate, Grid, ImmutableGrid
+from .grid import Grid, ImmutableGrid
 from .renderers import Color, ImageRenderer, TextRenderer
 
 

@@ -3,7 +3,7 @@ from mazes.grid import Direction as D
 from mazes.grid import Grid, ImmutableGrid
 from mazes.renderers import TextRenderer
 
-from ..asserts import *
+from ..asserts import assert_distances, assert_render
 
 
 class TestDijkstra:

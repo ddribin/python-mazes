@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 from ..distances import Distances
 from ..grid import Coordinate, ImmutableGrid
-from .utils import *
+from .utils import unwrap
 
 
 class Dijkstra:

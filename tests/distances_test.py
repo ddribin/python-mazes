@@ -13,7 +13,7 @@ class TestDistances:
 
         for y in range(4):
             for x in range(3):
-                assert distances[x, y] == None
+                assert distances[x, y] is None
 
     def test_setting_distances(self):
         distances = Distances(3, 3, (0, 0))
@@ -30,4 +30,4 @@ class TestDistances:
                 elif x == 1 and y == 1:
                     assert distances[x, y] == 2
                 else:
-                    assert distances[x, y] == None
+                    assert distances[x, y] is None

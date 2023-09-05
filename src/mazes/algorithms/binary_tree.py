@@ -19,7 +19,6 @@ class BinaryTree(Algorithm):
     def steps(self) -> Iterator[None]:
         grid = self._grid
         random = self._random
-        width = grid.width
 
         for coord in grid.coordinates():
             x, y = coord

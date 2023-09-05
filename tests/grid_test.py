@@ -5,8 +5,8 @@ from mazes import Grid
 class TestGrid:
     def test_no_direction(self):
         d = D.Empty
-        assert d == False
 
+        assert not d
         assert d == 0
 
     def test_combo_directoins(self):
@@ -37,10 +37,10 @@ class TestGrid:
     def test_index_out_of_bounds(self):
         grid = Grid(2, 3)
 
-        assert grid[-1, 0] == None
-        assert grid[1, -1] == None
-        assert grid[2, 0] == None
-        assert grid[0, 3] == None
+        assert grid[-1, 0] is None
+        assert grid[1, -1] is None
+        assert grid[2, 0] is None
+        assert grid[0, 3] is None
 
     def test_setitem(self):
         grid = Grid(3, 3)

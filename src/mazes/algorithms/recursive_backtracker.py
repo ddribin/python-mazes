@@ -4,7 +4,6 @@ from collections.abc import Iterator
 from ..direction import Direction
 from ..grid import Coordinate, Grid
 from .algorithm import Algorithm
-from .utils import unwrap
 
 
 class RecursiveBacktrackerRandom:

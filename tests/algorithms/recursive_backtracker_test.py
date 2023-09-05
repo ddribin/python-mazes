@@ -4,7 +4,7 @@ from mazes.direction import Direction as D
 from mazes.grid import Coordinate, Grid
 from mazes.renderers import TextRenderer
 
-from ..asserts import *
+from ..asserts import assert_render
 
 
 class FakeRecursiveBacktrackerRandom(RecursiveBacktrackerRandom):
