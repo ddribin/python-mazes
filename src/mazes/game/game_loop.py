@@ -2,6 +2,8 @@ import math
 
 import pygame as pg
 
+from mazes import Direction, Maze
+
 
 class GameLoop:
     def __init__(self) -> None:
@@ -13,7 +15,7 @@ class GameLoop:
         pg.init()
         pg.display.set_caption("Maze Game")
         SCREENRECT = pg.Rect(0, 0, self.width, self.height)
-        FPS = 60
+        FPS = 30
         winstyle = 0  # |FULLSCREEN
         bestdepth = pg.display.mode_ok(SCREENRECT.size, winstyle, 32)
         self._screen = pg.display.set_mode(
@@ -50,6 +52,10 @@ class GameLoop:
             (self.height - self._padding) / self._grid_height
         )
 
+        self._maze = Maze.generate(
+            self._grid_width, self._grid_height, Maze.AlgorithmType.RecursiveBacktracker
+        )
+
     def update(self) -> None:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -81,10 +87,15 @@ class GameLoop:
         fg = "white"
         cell_width = self._cell_width
         cell_height = self._cell_height
-        for row in range(self._grid_height):
-            for col in range(self._grid_width):
-                pg.draw.line(screen, fg, (x, y), (x + cell_width, y))
-                pg.draw.line(screen, fg, (x, y), (x, y + cell_height))
+        grid = self._maze.grid
+        for grid_y in range(self._grid_height):
+            for grid_x in range(self._grid_width):
+                dir = grid[grid_x, grid_y]
+                assert dir is not None
+                if Direction.N not in dir:
+                    pg.draw.line(screen, fg, (x, y), (x + cell_width, y))
+                if Direction.W not in dir:
+                    pg.draw.line(screen, fg, (x, y), (x, y + cell_height))
                 x += cell_width
             x = start_x
             y += cell_height
