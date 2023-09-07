@@ -57,9 +57,9 @@ class GameLoop:
 
         # Adjust padding to center in screen
         actual_width = self._cell_width * self._grid_width
-        self._padding_x = (self.width - actual_width) / 2
+        self._padding_x = math.floor((self.width - actual_width) / 2)
         actual_height = self._cell_height * self._grid_height
-        self._padding_y = (self.height - actual_height) / 2
+        self._padding_y = math.floor((self.height - actual_height) / 2)
 
         self.start_maze()
 
