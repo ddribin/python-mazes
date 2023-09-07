@@ -45,5 +45,4 @@ class RecursiveBacktracker(Algorithm):
                 grid.link(current, next_direction)
                 next_coord = next_direction.update_coordinate(current)
                 stack.append(next_coord)
-
-            yield
+                yield

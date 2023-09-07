@@ -2,7 +2,7 @@ import math
 
 import pygame as pg
 
-from mazes import Direction, Maze
+from mazes import Direction, MazeGenerator
 
 
 class GameLoop:
@@ -15,7 +15,7 @@ class GameLoop:
         pg.init()
         pg.display.set_caption("Maze Game")
         SCREENRECT = pg.Rect(0, 0, self.width, self.height)
-        FPS = 30
+        FPS = 60
         winstyle = 0  # |FULLSCREEN
         bestdepth = pg.display.mode_ok(SCREENRECT.size, winstyle, 32)
         self._screen = pg.display.set_mode(
@@ -46,35 +46,58 @@ class GameLoop:
         self._player = pg.Rect((300, 250, 50, 50))
         self._grid_width = 24
         self._grid_height = 18
-        self._padding = 40
-        self._cell_width = math.floor((self.width - self._padding) / self._grid_width)
+        self._padding_x = 40
+        self._padding_y = 40
+        self._cell_width = math.floor(
+            (self.width - self._padding_x * 2) / self._grid_width
+        )
         self._cell_height = math.floor(
-            (self.height - self._padding) / self._grid_height
+            (self.height - self._padding_x * 2) / self._grid_height
         )
 
-        self._maze = Maze.generate(
-            self._grid_width, self._grid_height, Maze.AlgorithmType.RecursiveBacktracker
+        # Adjust padding to center in screen
+        actual_width = self._cell_width * self._grid_width
+        self._padding_x = (self.width - actual_width) / 2
+        actual_height = self._cell_height * self._grid_height
+        self._padding_y = (self.height - actual_height) / 2
+
+        self.start_maze()
+
+    def start_maze(self) -> None:
+        self._maze = MazeGenerator(
+            self._grid_width,
+            self._grid_height,
+            (0, 0),
+            MazeGenerator.AlgorithmType.RecursiveBacktracker,
         )
+        self._maze_steps = self._maze.steps()
+        self._maze_generated = False
+        self._maze_generation_speed = 0
 
     def update(self) -> None:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self._running = False
 
-        self._player.width = 50
-        self._player.height = 50
+        if not self._maze_generated:
+            try:
+                for _ in range(self._maze_generation_speed):
+                    next(self._maze_steps)
+            except StopIteration:
+                print("Maze done!")
+                self._maze_generated = True
+
         key = pg.key.get_pressed()
-        speed = 5
-        if key[pg.K_j]:
-            self._player.move_ip(-speed, 0)
-        elif key[pg.K_l]:
-            self._player.move_ip(speed, 0)
-        if key[pg.K_i]:
-            self._player.move_ip(0, -speed)
-        elif key[pg.K_k]:
-            self._player.move_ip(0, speed)
         if key[pg.K_r]:
-            self._player = pg.Rect((300, 250, 50, 50))
+            self.start_maze()
+        if key[pg.K_SPACE]:
+            self._maze_generation_speed = 1
+        else:
+            self._maze_generation_speed = 0
+        if key[pg.K_j]:
+            for _ in self._maze_steps:
+                pass
+            self._maze_generated = True
         if key[pg.K_q]:
             self._running = False
 
@@ -82,9 +105,12 @@ class GameLoop:
         screen = self._screen
         screen.fill((0, 0, 0))
 
-        start_x, start_y = (self._padding / 2, self._padding / 2)
+        start_x, start_y = (self._padding_x, self._padding_y)
         x, y = (start_x, start_y)
-        fg = "white"
+        if self._maze_generated:
+            fg = (255, 255, 255)
+        else:
+            fg = (255, 0, 255)
         cell_width = self._cell_width
         cell_height = self._cell_height
         grid = self._maze.grid
