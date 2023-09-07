@@ -1,4 +1,5 @@
 import math
+from enum import Enum, auto
 
 import pygame as pg
 
@@ -6,6 +7,10 @@ from mazes import Direction, MazeGenerator
 
 
 class VisualMaze:
+    class State(Enum):
+        Generating = auto()
+        Done = auto()
+
     def __init__(
         self,
         grid_width: int,
@@ -42,30 +47,33 @@ class VisualMaze:
             MazeGenerator.AlgorithmType.RecursiveBacktracker,
         )
         self._maze_steps = self._maze.steps()
-        self._maze_generated = False
+        self._state = self.State.Generating
         self.generation_speed = 0
 
     def update(self) -> None:
-        if not self._maze_generated:
+        if self._state is self.State.Generating:
             try:
                 for _ in range(self.generation_speed):
                     next(self._maze_steps)
             except StopIteration:
                 print("Maze done!")
-                self._maze_generated = True
+                self._state = self.State.Done
 
     def run_to_completion(self) -> None:
+        if self._state is not self.State.Generating:
+            return
+
         for _ in self._maze_steps:
             pass
-        self._maze_generated = True
+        self._state = self.State.Done
 
     def draw(self, surface: pg.Surface) -> None:
         start_x, start_y = (self._padding_x, self._padding_y)
         x, y = (start_x, start_y)
-        if self._maze_generated:
-            fg = (255, 255, 255)
-        else:
+        if self._state is self.State.Generating:
             fg = (255, 0, 255)
+        else:
+            fg = (255, 255, 255)
         cell_width = self._cell_width
         cell_height = self._cell_height
         grid = self._maze.grid
