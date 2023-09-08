@@ -3,4 +3,5 @@ __pycache__/
 .envrc
 .vscode/
 build/
-*.egg-info  
+*.egg-info
+scratch/
