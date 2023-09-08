@@ -43,6 +43,7 @@ class GameLoop:
     def init(self) -> None:
         self._player = pg.Rect((300, 250, 50, 50))
         self._maze = GameMaze(24, 18, self.width, self.height, 40, 40)
+        self._last_step_down = False
 
     def update(self) -> None:
         for event in pg.event.get():
@@ -60,6 +61,12 @@ class GameLoop:
             self._maze.generation_speed = 0
         if key[pg.K_j]:
             self._maze.run_to_completion()
+        if key[pg.K_RIGHT]:
+            if not self._last_step_down:
+                self._maze.single_step()
+            self._last_step_down = True
+        else:
+            self._last_step_down = False
         if key[pg.K_q]:
             self._running = False
 

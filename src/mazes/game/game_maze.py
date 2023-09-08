@@ -61,6 +61,27 @@ class GameMaze:
         self._dijkstra_steps: Iterator[None] | None = None
         self._path_distances: Distances | None = None
 
+    def single_step(self) -> None:
+        if self._state is self.State.Generating:
+            self.single_step_generating()
+        if self._state is self.State.Dijkstra:
+            self.single_step_dijkstra()
+
+    def single_step_generating(self) -> None:
+        try:
+            next(self._maze_steps)
+        except StopIteration:
+            print("Maze done!")
+            self.setup_dijkstra()
+
+    def single_step_dijkstra(self) -> None:
+        try:
+            assert self._dijkstra_steps is not None
+            next(self._dijkstra_steps)
+        except StopIteration:
+            print("Dijkstra done!")
+            self.setup_done()
+
     def update(self) -> None:
         if self._state is self.State.Generating:
             self.update_generating()
@@ -87,10 +108,13 @@ class GameMaze:
                 next(self._dijkstra_steps)
         except StopIteration:
             print("Dijkstra done!")
-            assert self._dijkstra is not None
-            goal = self._maze.grid.southeast_corner
-            self._path_distances = self._dijkstra.path_to(goal)
-            self._state = self.State.Done
+            self.setup_done()
+
+    def setup_done(self) -> None:
+        assert self._dijkstra is not None
+        goal = self._maze.grid.southeast_corner
+        self._path_distances = self._dijkstra.path_to(goal)
+        self._state = self.State.Done
 
     def run_to_completion(self) -> None:
         if self._state is not self.State.Generating:
