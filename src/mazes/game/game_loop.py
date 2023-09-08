@@ -65,7 +65,7 @@ class GameLoop:
 
     def draw(self) -> None:
         screen = self._screen
-        screen.fill((0, 0, 0))
+        screen.fill((255, 255, 255))
 
         self._maze.draw(screen)
 

@@ -41,6 +41,10 @@ class MazeGenerator:
     def grid(self) -> Grid:
         return self._grid
 
+    @property
+    def start(self) -> Coordinate:
+        return self._start
+
     def __iter__(self) -> Iterator[None]:
         return self._algorithm.steps()
 
