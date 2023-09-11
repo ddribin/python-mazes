@@ -91,7 +91,7 @@ class GameMaze:
 
     def update_generating(self) -> None:
         try:
-            for _ in range(self.generation_speed):
+            for _ in range(self.generation_speed * 3):
                 next(self._maze_steps)
         except StopIteration:
             print("Maze done!")
@@ -129,23 +129,22 @@ class GameMaze:
     def draw(self, surface: pg.Surface) -> None:
         start_x, start_y = (self._padding_x, self._padding_y)
         x, y = (start_x, start_y)
-        if self._state is self.State.Generating:
-            fg = (128, 0, 128)
-        else:
-            fg = (0, 0, 0)
+        fg = (0, 0, 0)
+
         cell_width = self._cell_width
         cell_height = self._cell_height
         grid = self._maze.grid
         for grid_y in range(self._grid_height):
             for grid_x in range(self._grid_width):
                 coord = (grid_x, grid_y)
+                dir = grid[coord]
+                assert dir is not None
+
                 rect = pg.Rect(x, y, cell_width, cell_height)
-                rect_color = self.background_color_of(coord)
+                rect_color = self.background_color_of(coord, dir)
                 if rect_color is not None:
                     pg.draw.rect(surface, rect_color, rect)
 
-                dir = grid[coord]
-                assert dir is not None
                 if Direction.N not in dir:
                     pg.draw.line(surface, fg, (x, y), (x + cell_width, y))
                 if Direction.W not in dir:
@@ -155,19 +154,39 @@ class GameMaze:
             y += cell_height
         end_x = start_x + self._grid_width * cell_width
         end_y = start_y + self._grid_height * cell_height
+
+        # Draw right edge
         pg.draw.line(surface, fg, (end_x, start_y), (end_x, end_y))
+        # Draw bottom edge
         pg.draw.line(surface, fg, (start_x, end_y), (end_x, end_y))
 
-    def background_color_of(self, coord: Coordinate) -> Color | None:
-        if self._path_distances is not None:
-            distances = self._path_distances
-            distance = distances[coord]
-            if distance is not None:
-                max_distance = distances.max_distance
-                intensity = remap_zero(max_distance, 255, distance)
-                color = self._path_gradient.interpolate(intensity)
-                return color
+    def background_color_of(self, coord: Coordinate, dir: Direction) -> Color | None:
+        color = self.background_color_of_path(coord)
+        if color is not None:
+            return color
+        color = self.background_color_of_dijkstra(coord)
+        if color is not None:
+            return color
+        if dir is Direction.Empty:
+            return (128, 128, 128)
 
+        return None
+
+    def background_color_of_path(self, coord: Coordinate) -> Color | None:
+        distances = self._path_distances
+        if distances is None:
+            return None
+
+        distance = distances[coord]
+        if distance is not None:
+            max_distance = distances.max_distance
+            intensity = remap_zero(max_distance, 255, distance)
+            color = self._path_gradient.interpolate(intensity)
+            return color
+        else:
+            return None
+
+    def background_color_of_dijkstra(self, coord: Coordinate) -> Color | None:
         if self._dijkstra is None:
             return None
         distances = self._dijkstra.distances
