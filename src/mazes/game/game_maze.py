@@ -7,7 +7,8 @@ import pygame as pg
 from mazes import Coordinate, Direction, Distances, MazeGenerator
 from mazes.algorithms import Dijkstra
 
-Color = tuple[int, int, int]
+from .color_gradient import Color, ColorGradient
+from .utils import remap_zero
 
 
 class GameMaze:
@@ -42,8 +43,8 @@ class GameMaze:
         actual_height = self._cell_height * grid_height
         self._padding_y = math.floor((screen_height - actual_height) / 2)
 
-        self._gradient_start = (255, 255, 255)
-        self._gradient_end = (128, 0, 255)
+        self._distance_gradient = ColorGradient((255, 255, 250), (128, 0, 255), 256)
+        self._path_gradient = ColorGradient((255, 0, 0), (0, 255, 0), 256)
 
         self.reset()
 
@@ -163,10 +164,10 @@ class GameMaze:
             distance = distances[coord]
             if distance is not None:
                 max_distance = distances.max_distance
-                intensity = float(max_distance - distance) / max_distance
-                start_color = (255, 0, 0)
-                end_color = (0, 255, 0)
-                return self.interpolate_color(start_color, end_color, intensity)
+                intensity = remap_zero(max_distance, 255, distance)
+                color = self._path_gradient.interpolate(intensity)
+                return color
+
         if self._dijkstra is None:
             return None
         distances = self._dijkstra.distances
@@ -176,16 +177,6 @@ class GameMaze:
         if distance is None:
             return None
         max_distance = distances.max_distance
-        intensity = float(max_distance - distance) / max_distance
-        color = self.interpolate_color(
-            self._gradient_start, self._gradient_end, intensity
-        )
+        intensity = remap_zero(max_distance, 255, distance)
+        color = self._distance_gradient.interpolate(intensity)
         return color
-
-    def interpolate_color(self, c1: Color, c2: Color, val: float) -> Color:
-        r1, g1, b1 = c1
-        r2, g2, b2 = c2
-        r = round((r1 - r2) * val) + r2
-        g = round((g1 - g2) * val) + g2
-        b = round((b1 - b2) * val) + b2
-        return (r, g, b)
