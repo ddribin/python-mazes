@@ -8,7 +8,6 @@ from mazes import Coordinate, Direction, Distances, MazeGenerator
 from mazes.algorithms import Dijkstra
 
 from .color_gradient import Color, ColorGradient
-from .utils import remap_zero
 
 
 class GameMaze:
@@ -180,7 +179,8 @@ class GameMaze:
         distance = distances[coord]
         if distance is not None:
             max_distance = distances.max_distance
-            intensity = remap_zero(max_distance, 255, distance)
+            # inline remap
+            intensity = (distance * 255) // max_distance
             color = self._path_gradient.interpolate(intensity)
             return color
         else:
@@ -196,6 +196,7 @@ class GameMaze:
         if distance is None:
             return None
         max_distance = distances.max_distance
-        intensity = remap_zero(max_distance, 255, distance)
+        # inline remap
+        intensity = (distance * 255) // max_distance
         color = self._distance_gradient.interpolate(intensity)
         return color
