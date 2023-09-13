@@ -20,6 +20,21 @@ class RecursiveBacktracker(Algorithm):
     def __init__(self, grid: Grid, random=RecursiveBacktrackerRandom()) -> None:
         self._grid = grid
         self._random = random
+        self._current: set[Coordinate] = set()
+        self._trail: set[Coordinate] = set()
+        self._targets: set[Coordinate] = set()
+
+    @property
+    def current(self) -> set[Coordinate]:
+        return self._current
+
+    @property
+    def trail(self) -> set[Coordinate]:
+        return self._trail
+
+    @property
+    def targets(self) -> set[Coordinate]:
+        return self._targets
 
     def steps(self) -> Iterator[None]:
         grid = self._grid
@@ -27,7 +42,6 @@ class RecursiveBacktracker(Algorithm):
 
         start_at = random.random_coordinate(grid)
         stack = [start_at]
-        yield
 
         while stack:
             current = stack[-1]
@@ -37,12 +51,26 @@ class RecursiveBacktracker(Algorithm):
                 coord = dir.update_coordinate(current)
                 if not grid[coord]:
                     available_directions |= dir
+                    coord = dir.update_coordinate(current)
+
+            self._current = {current}
+            self._trail = set(stack)
 
             if not available_directions:
+                self._targets = set()
+                yield
                 stack.pop()
             else:
+                self._targets = {
+                    dir.update_coordinate(current) for dir in available_directions
+                }
+                yield
                 next_direction = random.choose_direction(available_directions)
                 grid.link(current, next_direction)
                 next_coord = next_direction.update_coordinate(current)
                 stack.append(next_coord)
-                yield
+
+        self._current = set()
+        self._trail = set()
+        self._targets = set()
+        yield

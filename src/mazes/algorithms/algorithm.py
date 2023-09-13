@@ -2,6 +2,8 @@ from collections.abc import Iterator
 
 from typing_extensions import Protocol
 
+from ..grid import Coordinate
+
 
 def next_step(step_iterator: Iterator[None]) -> bool:
     has_more = True
@@ -25,3 +27,15 @@ class Algorithm(Protocol):
         """
         for _ in self.steps():
             pass
+
+    @property
+    def current(self) -> set[Coordinate]:
+        ...
+
+    @property
+    def trail(self) -> set[Coordinate]:
+        ...
+
+    @property
+    def targets(self) -> set[Coordinate]:
+        ...

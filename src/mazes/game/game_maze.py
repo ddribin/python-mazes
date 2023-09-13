@@ -42,8 +42,8 @@ class GameMaze:
         actual_height = self._cell_height * grid_height
         self._padding_y = math.floor((screen_height - actual_height) / 2)
 
-        self._distance_gradient = ColorGradient((255, 255, 250), (128, 0, 255), 256)
-        self._path_gradient = ColorGradient((255, 0, 0), (0, 255, 0), 256)
+        self._distance_gradient = ColorGradient((253, 246, 227), (38, 139, 210), 256)
+        self._path_gradient = ColorGradient((220, 50, 47), (133, 153, 0), 256)
 
         self.reset()
 
@@ -160,6 +160,9 @@ class GameMaze:
         pg.draw.line(surface, fg, (start_x, end_y), (end_x, end_y))
 
     def background_color_of(self, coord: Coordinate, dir: Direction) -> Color | None:
+        color = self.background_color_of_cursor(coord)
+        if color is not None:
+            return color
         color = self.background_color_of_path(coord)
         if color is not None:
             return color
@@ -167,9 +170,20 @@ class GameMaze:
         if color is not None:
             return color
         if dir is Direction.Empty:
-            return (128, 128, 128)
+            return (147, 161, 161)
 
         return None
+
+    def background_color_of_cursor(self, coord: Coordinate) -> Color | None:
+        alg = self._maze._algorithm
+        if coord in alg.current:
+            return (220, 50, 47)
+        elif coord in alg.trail:
+            return (211, 54, 130)
+        elif coord in alg.targets:
+            return (181, 137, 0)
+        else:
+            return None
 
     def background_color_of_path(self, coord: Coordinate) -> Color | None:
         distances = self._path_distances
