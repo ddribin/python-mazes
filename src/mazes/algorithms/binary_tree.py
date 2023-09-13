@@ -2,7 +2,7 @@ import random
 from collections.abc import Iterator
 
 from ..direction import Direction
-from ..grid import Grid
+from ..grid import Coordinate, Grid
 from .algorithm import Algorithm
 
 
@@ -15,6 +15,20 @@ class BinaryTree(Algorithm):
     def __init__(self, grid: Grid, random=BinaryTreeRandom()) -> None:
         self._grid = grid
         self._random = random
+        self._current: set[Coordinate] = set()
+        self._targets: set[Coordinate] = set()
+
+    @property
+    def current(self) -> set[Coordinate]:
+        return self._current
+
+    @property
+    def trail(self) -> set[Coordinate]:
+        return set()
+
+    @property
+    def targets(self) -> set[Coordinate]:
+        return self._targets
 
     def steps(self) -> Iterator[None]:
         grid = self._grid
@@ -29,8 +43,14 @@ class BinaryTree(Algorithm):
             if Direction.E in valid_dirs:
                 neighbors |= Direction.E
 
-            if neighbors != Direction.Empty:
+            self._current = {coord}
+            self._targets = {dir.update_coordinate(coord) for dir in neighbors}
+            yield
+
+            if neighbors:
                 neighbor = random.choose_direction(neighbors)
                 grid.link(coord, neighbor)
 
-            yield
+        self._current = set()
+        self._targets = set()
+        yield

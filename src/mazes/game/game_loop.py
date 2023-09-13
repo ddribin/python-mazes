@@ -42,7 +42,7 @@ class GameLoop:
 
     def init(self) -> None:
         self._player = pg.Rect((300, 250, 50, 50))
-        self._maze = GameMaze(24 * 2, 18 * 2, self.width, self.height, 40, 40)
+        self._maze = GameMaze(24 * 3 // 2, 18 * 3 // 2, self.width, self.height, 40, 40)
         self._step_timer: int | None = None
 
     def update(self) -> None:
