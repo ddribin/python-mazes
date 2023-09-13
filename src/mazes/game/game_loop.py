@@ -6,8 +6,8 @@ from .game_maze import GameMaze
 class GameLoop:
     def __init__(self) -> None:
         self._running = True
-        self.width = 1280
-        self.height = 960
+        self.width = 800
+        self.height = 600
 
     def execute(self) -> int:
         pg.init()

@@ -60,6 +60,8 @@ class GameMaze:
         self._dijkstra: Dijkstra | None = None
         self._dijkstra_steps: Iterator[None] | None = None
         self._path_distances: Distances | None = None
+        self._pulse_gradient = ColorGradient((220, 50, 47), (253, 246, 227), 256)
+        self._pulse_tick = 0
 
     def single_step(self) -> None:
         if self._state is self.State.Generating:
@@ -69,6 +71,7 @@ class GameMaze:
 
     def single_step_generating(self) -> None:
         try:
+            self._pulse_tick = 0
             next(self._maze_steps)
         except StopIteration:
             print("Maze done!")
@@ -77,6 +80,7 @@ class GameMaze:
     def single_step_dijkstra(self) -> None:
         try:
             assert self._dijkstra_steps is not None
+            self._pulse_tick = 0
             next(self._dijkstra_steps)
         except StopIteration:
             print("Dijkstra done!")
@@ -87,6 +91,10 @@ class GameMaze:
             self.update_generating()
         if self._state is self.State.Dijkstra:
             self.update_dijkstra()
+        if self._state is self.State.Done:
+            self._pulse_tick = 0
+        else:
+            self._pulse_tick += 9
 
     def update_generating(self) -> None:
         try:
@@ -100,6 +108,8 @@ class GameMaze:
         self._dijkstra = Dijkstra(self._maze.grid, self._maze.grid.northwest_corner)
         self._dijkstra_steps = self._dijkstra.steps()
         self._state = self.State.Dijkstra
+        self._pulse_gradient = ColorGradient((38, 139, 210), (253, 246, 227), 256)
+        self._pulse_tick = 0
 
     def update_dijkstra(self) -> None:
         try:
@@ -177,7 +187,10 @@ class GameMaze:
     def background_color_of_cursor(self, coord: Coordinate) -> Color | None:
         alg = self._maze._algorithm
         if coord in alg.current:
-            return (220, 50, 47)
+            val = self._pulse_tick % 512
+            if val > 255:
+                val = 255 - (val - 256)
+            return self._pulse_gradient.interpolate(val)
         elif coord in alg.trail:
             return (211, 54, 130)
         elif coord in alg.targets:
@@ -210,7 +223,16 @@ class GameMaze:
         if distance is None:
             return None
         max_distance = distances.max_distance
-        # inline remap
-        intensity = (distance * 255) // max_distance
-        color = self._distance_gradient.interpolate(intensity)
+
+        color: Color
+        if distance == max_distance:
+            val = self._pulse_tick % 512
+            if val > 255:
+                val = 255 - (val - 256)
+            color = self._pulse_gradient.interpolate(val)
+        else:
+            # inline remap
+            intensity = (distance * 255) // max_distance
+            color = self._distance_gradient.interpolate(intensity)
+
         return color
