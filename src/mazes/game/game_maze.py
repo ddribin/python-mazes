@@ -60,7 +60,7 @@ class GameMaze:
         self._dijkstra: Dijkstra | None = None
         self._dijkstra_steps: Iterator[None] | None = None
         self._path_distances: Distances | None = None
-        self._pulse_gradient = ColorGradient((220, 50, 47), (253, 246, 227), 256)
+        self._pulse_gradient = ColorGradient((220, 50, 47), (235, 136, 134), 256)
         self._pulse_tick = 0
 
     def single_step(self) -> None:
@@ -108,7 +108,7 @@ class GameMaze:
         self._dijkstra = Dijkstra(self._maze.grid, self._maze.grid.northwest_corner)
         self._dijkstra_steps = self._dijkstra.steps()
         self._state = self.State.Dijkstra
-        self._pulse_gradient = ColorGradient((38, 139, 210), (253, 246, 227), 256)
+        self._pulse_gradient = ColorGradient((38, 139, 210), (22, 82, 124), 256)
         self._pulse_tick = 0
 
     def update_dijkstra(self) -> None:
