@@ -9,7 +9,7 @@ class TestGrid:
         assert not d
         assert d == 0
 
-    def test_combo_directoins(self):
+    def test_combo_directions(self):
         d = D.Empty
 
         assert D.N not in d
@@ -57,6 +57,15 @@ class TestGrid:
 
         assert grid[1, 1] == D.N | D.W
 
+    def test_unmark(self):
+        grid = Grid(3, 3)
+
+        grid.mark((1, 1), D.N)
+        grid.mark((1, 1), D.W)
+        grid.unmark((1, 1), D.N)
+
+        assert grid[1, 1] == D.W
+
     def test_link(self):
         grid = Grid(3, 3)
 
@@ -64,6 +73,15 @@ class TestGrid:
 
         assert grid[1, 1] == D.N
         assert grid[1, 0] == D.S
+
+    def test_unlink(self):
+        grid = Grid(3, 3)
+
+        grid.link((1, 1), D.N)
+        grid.unlink((1, 1), D.N)
+
+        assert grid[1, 1] is D.Empty
+        assert grid[1, 0] is D.Empty
 
     def test_link_multiple_individually(self):
         grid = Grid(3, 3)

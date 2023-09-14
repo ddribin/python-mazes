@@ -124,6 +124,11 @@ class Grid(ImmutableGrid):
             x, y = coordinate
             self._grid[y][x] |= direction
 
+    def unmark(self, coordinate: Coordinate, direction: Direction) -> None:
+        if self.is_valid_coordinate(coordinate):
+            x, y = coordinate
+            self._grid[y][x] &= ~direction
+
     def link_path(self, start: Coordinate, directions: list[Direction]) -> Coordinate:
         current = start
         for direction in directions:
@@ -148,3 +153,21 @@ class Grid(ImmutableGrid):
         if bidirectional:
             direction = direction.opposite()
             self.mark(other_coordinate, direction)
+
+    def unlink(
+        self, coordinate: Coordinate, directions: Direction, bidirectional=True
+    ) -> None:
+        for direction in directions:
+            self._unlink_one(coordinate, direction, bidirectional)
+
+    def _unlink_one(
+        self, coordinate: Coordinate, direction: Direction, bidirectional: bool
+    ) -> None:
+        other_coordinate = direction.update_coordinate(coordinate)
+        if not self.is_valid_coordinate(other_coordinate):
+            return
+
+        self.unmark(coordinate, direction)
+        if bidirectional:
+            direction = direction.opposite()
+            self.unmark(other_coordinate, direction)
