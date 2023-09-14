@@ -1,3 +1,4 @@
+import logging
 import math
 from collections.abc import Iterator
 from enum import Enum, auto
@@ -25,6 +26,7 @@ class GameMaze:
         padding_x: int,
         padding_y: int,
     ) -> None:
+        self.logger = logging.getLogger(__name__)
         self._grid_width = grid_width
         self._grid_height = grid_height
         self._screen_width = screen_width
@@ -54,6 +56,7 @@ class GameMaze:
             (0, self._grid_height - 1),
             MazeGenerator.AlgorithmType.RecursiveBacktracker,
         )
+        print(f"Seed: {self._maze.seed}")
         self._maze_steps = self._maze.steps()
         self._state = self.State.Generating
         self.generation_speed = 0
@@ -74,7 +77,7 @@ class GameMaze:
             self._pulse_tick = 0
             next(self._maze_steps)
         except StopIteration:
-            print("Maze done!")
+            self.logger.info("Maze done!")
             self.setup_dijkstra()
 
     def single_step_dijkstra(self) -> None:
@@ -83,7 +86,7 @@ class GameMaze:
             self._pulse_tick = 0
             next(self._dijkstra_steps)
         except StopIteration:
-            print("Dijkstra done!")
+            self.logger.info("Dijkstra done!")
             self.setup_done()
 
     def update(self) -> None:
@@ -101,7 +104,7 @@ class GameMaze:
             for _ in range(self.generation_speed * 3):
                 next(self._maze_steps)
         except StopIteration:
-            print("Maze done!")
+            self.logger.info("Maze done!")
             self.setup_dijkstra()
 
     def setup_dijkstra(self) -> None:
@@ -117,7 +120,7 @@ class GameMaze:
                 assert self._dijkstra_steps is not None
                 next(self._dijkstra_steps)
         except StopIteration:
-            print("Dijkstra done!")
+            self.logger.info("Dijkstra done!")
             self.setup_done()
 
     def setup_done(self) -> None:
@@ -127,13 +130,15 @@ class GameMaze:
         self._state = self.State.Done
 
     def run_to_completion(self) -> None:
-        if self._state is not self.State.Generating:
-            return
-
-        for _ in self._maze_steps:
-            pass
-
-        self.setup_dijkstra()
+        if self._state is self.State.Generating:
+            for _ in self._maze_steps:
+                pass
+            self.setup_dijkstra()
+        elif self._state is self.State.Dijkstra:
+            assert self._dijkstra_steps is not None
+            for _ in self._dijkstra_steps:
+                pass
+            self.setup_done()
 
     def draw(self, surface: pg.Surface) -> None:
         start_x, start_y = (self._padding_x, self._padding_y)

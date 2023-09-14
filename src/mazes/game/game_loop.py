@@ -1,3 +1,5 @@
+import logging
+
 import pygame as pg
 
 from .game_maze import GameMaze
@@ -8,6 +10,7 @@ class GameLoop:
         self._running = True
         self.width = 800
         self.height = 600
+        self.logger = logging.getLogger(__name__)
 
     def execute(self) -> int:
         pg.init()
@@ -35,15 +38,17 @@ class GameLoop:
             frame = frame % FPS
             if frame == 0:
                 fps = clock.get_fps()
-                print(f"FPS: {fps}")
+                self.logger.info("FPS: %f", fps)
 
         pg.quit()
         return 0
 
     def init(self) -> None:
         self._player = pg.Rect((300, 250, 50, 50))
-        self._maze = GameMaze(24 * 3 // 2, 18 * 3 // 2, self.width, self.height, 40, 40)
+        self._maze = GameMaze(24 * 3 // 2, 18 * 3 // 2, self.width, self.height, 20, 20)
         self._step_timer: int | None = None
+        self._reset_key_down = False
+        self._jump_key_down = False
 
     def update(self) -> None:
         for event in pg.event.get():
@@ -53,13 +58,19 @@ class GameLoop:
         self._maze.update()
 
         key = pg.key.get_pressed()
-        if key[pg.K_r]:
+        old_reset_key_down = self._reset_key_down
+        self._reset_key_down = key[pg.K_r]
+        if not old_reset_key_down and self._reset_key_down:
             self._maze.reset()
+
         if key[pg.K_SPACE]:
             self._maze.generation_speed = 1
         else:
             self._maze.generation_speed = 0
-        if key[pg.K_j]:
+
+        old_jump_key_down = self._jump_key_down
+        self._jump_key_down = key[pg.K_j]
+        if not old_jump_key_down and self._jump_key_down:
             self._maze.run_to_completion()
         if key[pg.K_RIGHT]:
             self.tick_single_step_timer()
@@ -87,5 +98,6 @@ class GameLoop:
 
 
 def main() -> int:
+    # logging.basicConfig(level=logging.DEBUG)
     game_loop = GameLoop()
     return game_loop.execute()
