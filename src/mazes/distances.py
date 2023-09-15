@@ -1,11 +1,55 @@
 from collections.abc import Iterator
 
+from typing_extensions import Protocol
+
 from .direction import Coordinate
 
 Distance = int | None
 
 
-class Distances:
+class ImmutableDistances(Protocol):
+    @property
+    def width(self) -> int:
+        ...
+
+    @property
+    def height(self) -> int:
+        ...
+
+    @property
+    def root(self) -> Coordinate:
+        ...
+
+    @property
+    def max_coordinate(self) -> Coordinate:
+        ...
+
+    @property
+    def max_distance(self) -> int:
+        ...
+
+    def __getitem__(self, coordinate: Coordinate) -> Distance:
+        ...
+
+    def coordinates(self) -> Iterator[Coordinate]:
+        ...
+
+    # Default implementations
+
+    def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
+        x, y = coordinate
+        if x not in range(self.width):
+            return False
+        if y not in range(self.height):
+            return False
+        return True
+
+    def assert_valid_coordinate(self, coordinate: Coordinate) -> None:
+        if not self.is_valid_coordinate(coordinate):
+            raise IndexError
+
+
+class Distances(ImmutableDistances):
     def __init__(self, width: int, height: int, root: Coordinate) -> None:
         self._width = width
         self._height = height
@@ -38,18 +82,6 @@ class Distances:
     @property
     def max_distance(self) -> int:
         return self._max_distance
-
-    def is_valid_coordinate(self, coordinate: Coordinate) -> bool:
-        x, y = coordinate
-        if x not in range(self._width):
-            return False
-        if y not in range(self._height):
-            return False
-        return True
-
-    def assert_valid_coordinate(self, coordinate: Coordinate) -> None:
-        if not self.is_valid_coordinate(coordinate):
-            raise IndexError
 
     def __getitem__(self, coordinate: Coordinate) -> Distance:
         self.assert_valid_coordinate(coordinate)

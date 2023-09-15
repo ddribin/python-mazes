@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import random
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-from . import Coordinate, Grid
-from .algorithms import Algorithm, BinaryTree, RecursiveBacktracker, Sidewinder
+from . import Coordinate, Distances, Grid, ImmutableDistances, ImmutableGrid
+from .algorithms import Algorithm
 
 
 class AlgorithmType(Enum):
@@ -45,21 +45,71 @@ class MazeOptions:
         return (self.width - 1, self.height - 1)
 
 
+@dataclass(frozen=True)
+class MazeOpPushStack:
+    val: Coordinate
+
+
+@dataclass(frozen=True)
+class MazeOpPopStack:
+    pass
+
+
+MazeOperation = MazeOpPushStack | MazeOpPopStack
+
+
+class MazeState:
+    def __init__(self, grid: Grid, start: Coordinate) -> None:
+        width = grid.width
+        height = grid.height
+
+        self._grid = grid
+        self._start = start
+        self._distances = Distances(width, height, start)
+        self._path = Distances(width, height, start)
+        self._stack: list[Coordinate] = []
+
+    @property
+    def grid(self) -> ImmutableGrid:
+        return self._grid
+
+    @property
+    def start(self) -> Coordinate:
+        return self._start
+
+    @property
+    def distances(self) -> ImmutableDistances:
+        return self._distances
+
+    @property
+    def path(self) -> ImmutableDistances:
+        return self._path
+
+    @property
+    def stack(self) -> Sequence[Coordinate]:
+        return self._stack
+
+
+def MutableMazeState(MazeState):
+    def apply_operation(self, operation: MazeOperation) -> MazeOperation:
+        return operation
+
+
 class MazeGenerator:
     def __init__(self, options: MazeOptions) -> None:
+        self._width = options.width
+        self._height = options.height
         self._grid = Grid(options.width, options.height)
         self._start = options.start
         self._end = options.end
         self._algorithmType = options.algorithmType
-        self._algorithm = self._make_algorithm(options.algorithmType)
-        if options.seed is None:
-            seed = random.randint(0, 2**64 - 1)
-        else:
-            seed = options.seed
-        random.seed(seed)
-        self._seed = seed
+        self._algorithm = self._init_algorithm(options.algorithmType)
+        self._seed = self._init_seed(options.seed)
+        self._maze_state = MazeState(self._grid, self._start)
 
-    def _make_algorithm(self, mazeType: AlgorithmType) -> Algorithm:
+    def _init_algorithm(self, mazeType: AlgorithmType) -> Algorithm:
+        from .algorithms import BinaryTree, RecursiveBacktracker, Sidewinder
+
         grid = self._grid
         match mazeType:
             case AlgorithmType.BinaryTree:
@@ -71,8 +121,14 @@ class MazeGenerator:
             case unknown:
                 raise ValueError(unknown)
 
+    def _init_seed(self, seed: int | None) -> int:
+        if seed is None:
+            seed = random.randint(0, 2**64 - 1)
+        random.seed(seed)
+        return seed
+
     @property
-    def grid(self) -> Grid:
+    def grid(self) -> ImmutableGrid:
         return self._grid
 
     @property
@@ -86,6 +142,10 @@ class MazeGenerator:
     @property
     def seed(self) -> int:
         return self._seed
+
+    @property
+    def state(self) -> MazeState:
+        return self._maze_state
 
     def __iter__(self) -> Iterator[None]:
         return self._algorithm.steps()

@@ -2,12 +2,17 @@ import random
 from collections.abc import Iterator
 
 from ..direction import Direction
-from ..grid import Coordinate, Grid
+from ..grid import Coordinate, Grid, ImmutableGrid
+from ..maze_generator import (  # MazeOpPopStack,
+    MazeOperation,
+    MazeOpPushStack,
+    MazeState,
+)
 from .algorithm import Algorithm
 
 
 class RecursiveBacktrackerRandom:
-    def random_coordinate(self, grid: Grid) -> Coordinate:
+    def random_coordinate(self, grid: ImmutableGrid) -> Coordinate:
         x = random.randrange(0, grid.width)
         y = random.randrange(0, grid.height)
         return (x, y)
@@ -17,12 +22,18 @@ class RecursiveBacktrackerRandom:
 
 
 class RecursiveBacktracker(Algorithm):
-    def __init__(self, grid: Grid, random=RecursiveBacktrackerRandom()) -> None:
+    def __init__(
+        self,
+        grid: Grid,
+        random=RecursiveBacktrackerRandom(),
+        state: MazeState | None = None,
+    ) -> None:
         self._grid = grid
         self._random = random
         self._current: set[Coordinate] = set()
         self._trail: set[Coordinate] = set()
         self._targets: set[Coordinate] = set()
+        self._state = state
 
     @property
     def current(self) -> set[Coordinate]:
@@ -74,3 +85,15 @@ class RecursiveBacktracker(Algorithm):
         self._trail = set()
         self._targets = set()
         yield
+
+    def operations(self) -> Iterator[MazeOperation]:
+        state = self._state
+        assert state is not None
+        grid = state.grid
+        random = self._random
+
+        start_at = random.random_coordinate(grid)
+        yield MazeOpPushStack(start_at)
+
+        while state.stack:
+            break
