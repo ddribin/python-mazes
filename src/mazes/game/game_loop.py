@@ -38,7 +38,7 @@ class GameLoop:
             frame = frame % FPS
             if frame == 0:
                 fps = clock.get_fps()
-                self.logger.info("FPS: %f", fps)
+                self.logger.debug("FPS: %f", fps)
 
         pg.quit()
         return 0
@@ -98,6 +98,6 @@ class GameLoop:
 
 
 def main() -> int:
-    # logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     game_loop = GameLoop()
     return game_loop.execute()

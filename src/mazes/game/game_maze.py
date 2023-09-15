@@ -5,7 +5,14 @@ from enum import Enum, auto
 
 import pygame as pg
 
-from mazes import Coordinate, Direction, Distances, MazeGenerator
+from mazes import (
+    AlgorithmType,
+    Coordinate,
+    Direction,
+    Distances,
+    MazeGenerator,
+    MazeOptions,
+)
 from mazes.algorithms import Dijkstra
 
 from .color_gradient import Color, ColorGradient
@@ -50,12 +57,22 @@ class GameMaze:
         self.reset()
 
     def reset(self) -> None:
-        self._maze = MazeGenerator(
-            self._grid_width,
-            self._grid_height,
-            (0, self._grid_height - 1),
-            MazeGenerator.AlgorithmType.RecursiveBacktracker,
-        )
+        options = MazeOptions(self._grid_width, self._grid_height)
+
+        options.algorithmType = AlgorithmType.RecursiveBacktracker
+        options.start = options.northwest_corner
+        options.end = options.southeast_corner
+
+        # options.algorithmType = AlgorithmType.Sidewinder
+        # options.start = options.southwest_corner
+        # options.end = options.southeast_corner
+
+        # options.algorithmType = AlgorithmType.BinaryTree
+        # options.start = options.southwest_corner
+        # options.end = options.northwest_corner
+
+        logging.info("options: %s", options)
+        self._maze = MazeGenerator(options)
         print(f"Seed: {self._maze.seed}")
         self._maze_steps = self._maze.steps()
         self._state = self.State.Generating
@@ -108,7 +125,7 @@ class GameMaze:
             self.setup_dijkstra()
 
     def setup_dijkstra(self) -> None:
-        self._dijkstra = Dijkstra(self._maze.grid, self._maze.grid.northwest_corner)
+        self._dijkstra = Dijkstra(self._maze.grid, self._maze.start)
         self._dijkstra_steps = self._dijkstra.steps()
         self._state = self.State.Dijkstra
         self._pulse_gradient = ColorGradient((38, 139, 210), (22, 82, 124), 256)
@@ -125,7 +142,8 @@ class GameMaze:
 
     def setup_done(self) -> None:
         assert self._dijkstra is not None
-        goal = self._maze.grid.southeast_corner
+        print(f"{self._maze.start} {self._maze.end}")
+        goal = self._maze.end
         self._path_distances = self._dijkstra.path_to(goal)
         self._state = self.State.Done
 
