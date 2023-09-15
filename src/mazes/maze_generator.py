@@ -4,8 +4,9 @@ import random
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import assert_never
 
-from . import Coordinate, Distances, Grid, ImmutableDistances, ImmutableGrid
+from . import Coordinate, Direction, Distances, Grid, ImmutableDistances, ImmutableGrid
 from .algorithms import Algorithm
 
 
@@ -55,7 +56,15 @@ class MazeOpPopStack:
     pass
 
 
-MazeOperation = MazeOpPushStack | MazeOpPopStack
+@dataclass(frozen=True)
+class MazeOpLink:
+    coodinate: Coordinate
+    dirction: Direction
+
+
+MazeOperation = MazeOpPushStack | MazeOpPopStack | MazeOpLink
+
+MazeOperations = list[MazeOperation]
 
 
 class MazeState:
@@ -90,9 +99,17 @@ class MazeState:
         return self._stack
 
 
-def MutableMazeState(MazeState):
-    def apply_operation(self, operation: MazeOperation) -> MazeOperation:
-        return operation
+class MutableMazeState(MazeState):
+    def apply_operation(self, operation: MazeOperation) -> None:
+        match operation:
+            case MazeOpPushStack(val):
+                self._stack.append(val)
+            case MazeOpPopStack():
+                self._stack.pop()
+            case MazeOpLink(coord, dir):
+                self._grid.link(coord, dir)
+            case _:
+                assert_never(operation)
 
 
 class MazeGenerator:
