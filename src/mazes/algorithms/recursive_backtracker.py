@@ -3,13 +3,8 @@ from collections.abc import Iterator
 
 from ..direction import Direction
 from ..grid import Coordinate, Grid, ImmutableGrid
-from ..maze_generator import (  # MazeOpPopStack,
-    MazeOperations,
-    MazeOpLink,
-    MazeOpPopStack,
-    MazeOpPushStack,
-    MazeState,
-)
+from ..maze_generator import MazeOperations  # MazeOpPopStack,
+from ..maze_generator import MazeOpGridLink, MazeOpPopRun, MazeOpPushRun, MazeState
 from .algorithm import Algorithm
 
 
@@ -95,17 +90,17 @@ class RecursiveBacktracker(Algorithm):
         grid = state.grid
         random = self._random
         start_at = random.random_coordinate(grid)
-        return [MazeOpPushStack(start_at)]
+        return [MazeOpPushRun(start_at)]
 
     def operations(self) -> Iterator[MazeOperations]:
         state = self._state
         assert state is not None
         grid = state.grid
-        stack = state.stack
+        stack = state.run
         random = self._random
 
         start_at = random.random_coordinate(grid)
-        yield [MazeOpPushStack(start_at)]
+        yield [MazeOpPushRun(start_at)]
 
         while stack:
             current = stack[-1]
@@ -118,11 +113,14 @@ class RecursiveBacktracker(Algorithm):
                     coord = dir.update_coordinate(current)
 
             if not available_directions:
-                yield [MazeOpPopStack()]
+                yield [MazeOpPopRun()]
             else:
                 next_direction = random.choose_direction(available_directions)
                 next_coord = next_direction.update_coordinate(current)
 
-                yield [MazeOpLink(current, next_direction), MazeOpPushStack(next_coord)]
+                yield [
+                    MazeOpGridLink(current, next_direction),
+                    MazeOpPushRun(next_coord),
+                ]
                 # grid.link(current, next_direction)
                 # stack.append(next_coord)
