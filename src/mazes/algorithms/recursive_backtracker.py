@@ -1,10 +1,18 @@
+import logging
 import random
 from collections.abc import Iterator
 
 from ..direction import Direction
 from ..grid import Coordinate, Grid, ImmutableGrid
-from ..maze_generator import MazeOperations  # MazeOpPopStack,
-from ..maze_generator import MazeOpGridLink, MazeOpPopRun, MazeOpPushRun, MazeState
+from ..maze_generator import (
+    MazeOperations,
+    MazeOpGridLink,
+    MazeOpPopRun,
+    MazeOpPushRun,
+    MazeOpSetTargetCoords,
+    MazeOpSetTargetDirs,
+    MazeState,
+)
 from .algorithm import Algorithm
 
 
@@ -31,6 +39,7 @@ class RecursiveBacktracker(Algorithm):
         self._trail: set[Coordinate] = set()
         self._targets: set[Coordinate] = set()
         self._state = state
+        self._logger = logging.getLogger(__name__)
 
     @property
     def current(self) -> set[Coordinate]:
@@ -50,6 +59,9 @@ class RecursiveBacktracker(Algorithm):
 
         start_at = random.random_coordinate(grid)
         stack = [start_at]
+        self._current = {stack[-1]}
+        self._trail = set(stack)
+        yield
 
         while stack:
             current = stack[-1]
@@ -99,28 +111,53 @@ class RecursiveBacktracker(Algorithm):
         stack = state.run
         random = self._random
 
-        start_at = random.random_coordinate(grid)
-        yield [MazeOpPushRun(start_at)]
+        current: Coordinate | None = random.random_coordinate(grid)
+        available_directions = self.available_directions(grid, current)
+        ops = [
+            MazeOpPushRun(current),
+            MazeOpSetTargetDirs(available_directions),
+        ]
+        self._logger.debug("ops: %s", ops)
+        yield ops
 
         while stack:
             current = stack[-1]
-            valid_dirs = grid.valid_directions(current)
-            available_directions = Direction.Empty
-            for dir in valid_dirs:
-                coord = dir.update_coordinate(current)
-                if not grid[coord]:
-                    available_directions |= dir
-                    coord = dir.update_coordinate(current)
+            available_directions = self.available_directions(grid, current)
+            self._logger.debug(
+                "stack=%r available_directions=%r targets=%r",
+                stack,
+                available_directions,
+                state.target_coordinates,
+            )
 
             if not available_directions:
-                yield [MazeOpPopRun()]
+                ops = [MazeOpPopRun(), MazeOpSetTargetCoords([])]
             else:
                 next_direction = random.choose_direction(available_directions)
                 next_coord = next_direction.update_coordinate(current)
+                targets = self.targets_from_directions(current, available_directions)
 
-                yield [
+                ops = [
                     MazeOpGridLink(current, next_direction),
                     MazeOpPushRun(next_coord),
+                    MazeOpSetTargetCoords(targets),
                 ]
-                # grid.link(current, next_direction)
-                # stack.append(next_coord)
+
+            self._logger.debug("ops: %r", ops)
+            yield ops
+
+    def available_directions(self, grid: ImmutableGrid, coord: Coordinate) -> Direction:
+        valid_dirs = grid.valid_directions(coord)
+        available_directions = Direction.Empty
+        for dir in valid_dirs:
+            coord = dir.update_coordinate(coord)
+            if not grid[coord]:
+                available_directions |= dir
+                coord = dir.update_coordinate(coord)
+        return available_directions
+
+    def targets_from_directions(
+        self, coord: Coordinate, directions: Direction
+    ) -> list[Coordinate]:
+        targets = [dir.update_coordinate(coord) for dir in directions]
+        return targets

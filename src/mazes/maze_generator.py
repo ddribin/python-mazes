@@ -74,8 +74,13 @@ class MazeOpGridUnlink:
 
 
 @dataclass(frozen=True)
-class MazeOpSetTargets:
+class MazeOpSetTargetCoords:
     val: list[Coordinate] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class MazeOpSetTargetDirs:
+    directions: Direction
 
 
 MazeOperation = (
@@ -84,7 +89,8 @@ MazeOperation = (
     | MazeOpGridLink
     | MazeOpGridUnlink
     | MazeOpSetRun
-    | MazeOpSetTargets
+    | MazeOpSetTargetCoords
+    | MazeOpSetTargetDirs
 )
 
 MazeOperations = list[MazeOperation]
@@ -100,7 +106,8 @@ class MazeState:
         self._distances = Distances(width, height, start)
         self._path = Distances(width, height, start)
         self._run: list[Coordinate] = []
-        self._targets: list[Coordinate] = []
+        self._target_coordinates: list[Coordinate] = []
+        self._target_directions = Direction.Empty
 
     @property
     def grid(self) -> ImmutableGrid:
@@ -123,8 +130,12 @@ class MazeState:
         return self._run
 
     @property
-    def targets(self) -> Sequence[Coordinate]:
-        return self._targets
+    def target_coordinates(self) -> Sequence[Coordinate]:
+        return self._target_coordinates
+
+    @property
+    def target_directions(self) -> Direction:
+        return self._target_directions
 
 
 class MutableMazeState(MazeState):
@@ -135,14 +146,14 @@ class MutableMazeState(MazeState):
                 return MazeOpPopRun()
 
             case MazeOpPopRun():
-                head = self._run[-1]
+                old_head = self._run[-1]
                 self._run.pop()
-                return MazeOpPushRun(head)
+                return MazeOpPushRun(old_head)
 
             case MazeOpSetRun(val):
-                run = self._run
+                old_run = self._run
                 self._run = val
-                return MazeOpSetRun(run)
+                return MazeOpSetRun(old_run)
 
             case MazeOpGridLink(coord, dir):
                 self._grid.link(coord, dir)
@@ -152,10 +163,15 @@ class MutableMazeState(MazeState):
                 self._grid.unlink(coord, dir)
                 return MazeOpGridLink(coord, dir)
 
-            case MazeOpSetTargets(val):
-                targets = self._targets
-                self._targets = val
-                return MazeOpSetTargets(targets)
+            case MazeOpSetTargetCoords(val):
+                old_targets = self._target_coordinates
+                self._target_coordinates = val
+                return MazeOpSetTargetCoords(old_targets)
+
+            case MazeOpSetTargetDirs(dirs):
+                old_dirs = self._target_directions
+                self._target_directions = dirs
+                return MazeOpSetTargetDirs(old_dirs)
 
             case _:
                 assert_never(operation)
