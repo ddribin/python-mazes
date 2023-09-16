@@ -5,12 +5,11 @@ from collections.abc import Iterator
 from ..direction import Direction
 from ..grid import Coordinate, Grid, ImmutableGrid
 from ..maze_generator import (
-    MazeOperations,
+    MazeOperation,
     MazeOpGridLink,
     MazeOpPopRun,
     MazeOpPushRun,
     MazeOpSetTargetCoords,
-    MazeOpSetTargetDirs,
     MazeState,
 )
 from .algorithm import Algorithm
@@ -61,17 +60,10 @@ class RecursiveBacktracker(Algorithm):
         stack = [start_at]
         self._current = {stack[-1]}
         self._trail = set(stack)
-        yield
 
         while stack:
             current = stack[-1]
-            valid_dirs = grid.valid_directions(current)
-            available_directions = Direction.Empty
-            for dir in valid_dirs:
-                coord = dir.update_coordinate(current)
-                if not grid[coord]:
-                    available_directions |= dir
-                    coord = dir.update_coordinate(current)
+            available_directions = grid.available_directions(current)
 
             self._current = {current}
             self._trail = set(stack)
@@ -95,34 +87,22 @@ class RecursiveBacktracker(Algorithm):
         self._targets = set()
         yield
 
-    def initial_operations(self) -> MazeOperations:
-        state = self._state
-        assert state is not None
+    def send_op(self, op: MazeOperation) -> Iterator[MazeOperation]:
+        yield op
 
-        grid = state.grid
-        random = self._random
-        start_at = random.random_coordinate(grid)
-        return [MazeOpPushRun(start_at)]
-
-    def operations(self) -> Iterator[MazeOperations]:
+    def operations(self) -> Iterator[MazeOperation]:
         state = self._state
         assert state is not None
         grid = state.grid
         stack = state.run
         random = self._random
 
-        current: Coordinate | None = random.random_coordinate(grid)
-        available_directions = self.available_directions(grid, current)
-        ops = [
-            MazeOpPushRun(current),
-            MazeOpSetTargetDirs(available_directions),
-        ]
-        self._logger.debug("ops: %s", ops)
-        yield ops
+        start_at: Coordinate | None = random.random_coordinate(grid)
+        yield MazeOpPushRun(start_at)
 
         while stack:
             current = stack[-1]
-            available_directions = self.available_directions(grid, current)
+            available_directions = grid.available_directions(current)
             self._logger.debug(
                 "stack=%r available_directions=%r targets=%r",
                 stack,
@@ -131,30 +111,16 @@ class RecursiveBacktracker(Algorithm):
             )
 
             if not available_directions:
-                ops = [MazeOpPopRun(), MazeOpSetTargetCoords([])]
+                yield MazeOpSetTargetCoords([])
+                yield MazeOpPopRun()
             else:
                 next_direction = random.choose_direction(available_directions)
                 next_coord = next_direction.update_coordinate(current)
                 targets = self.targets_from_directions(current, available_directions)
 
-                ops = [
-                    MazeOpGridLink(current, next_direction),
-                    MazeOpPushRun(next_coord),
-                    MazeOpSetTargetCoords(targets),
-                ]
-
-            self._logger.debug("ops: %r", ops)
-            yield ops
-
-    def available_directions(self, grid: ImmutableGrid, coord: Coordinate) -> Direction:
-        valid_dirs = grid.valid_directions(coord)
-        available_directions = Direction.Empty
-        for dir in valid_dirs:
-            coord = dir.update_coordinate(coord)
-            if not grid[coord]:
-                available_directions |= dir
-                coord = dir.update_coordinate(coord)
-        return available_directions
+                yield MazeOpGridLink(current, next_direction)
+                yield MazeOpPushRun(next_coord)
+                yield MazeOpSetTargetCoords(targets)
 
     def targets_from_directions(
         self, coord: Coordinate, directions: Direction

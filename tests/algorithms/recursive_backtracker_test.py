@@ -4,7 +4,7 @@ from mazes.algorithms import RecursiveBacktracker, RecursiveBacktrackerRandom
 from mazes.algorithms.utils import flatten
 from mazes.direction import Direction as D
 from mazes.grid import Coordinate, Grid, ImmutableGrid
-from mazes.maze_generator import MazeOperations, MutableMazeState
+from mazes.maze_generator import MazeOperation, MutableMazeState
 from mazes.renderers import TextRenderer
 
 from ..asserts import assert_render
@@ -60,11 +60,10 @@ class TestRecursiveBacktracker:
         ]
 
         algo = self.make_algorithm(grid, (0, 1), flatten(directions), state)
-        saved_ops: list[MazeOperations] = []
-        for ops in algo.operations():
-            saved_ops.append(ops)
-            for op in ops:
-                state.apply_operation(op)
+        saved_ops: list[MazeOperation] = []
+        for op in algo.operations():
+            saved_ops.append(op)
+            state.apply_operation(op)
 
         text = TextRenderer.render_grid(grid)
 

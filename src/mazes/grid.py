@@ -49,6 +49,15 @@ class ImmutableGrid(Protocol):
 
         return valid_directions
 
+    def available_directions(self, coord: Coordinate) -> Direction:
+        available_directions = Direction.Empty
+        valid_dirs = self.valid_directions(coord)
+        for dir in valid_dirs:
+            next_coord = dir.update_coordinate(coord)
+            if self[next_coord] is Direction.Empty:
+                available_directions |= dir
+        return available_directions
+
     @property
     def northwest_corner(self) -> Coordinate:
         return (0, 0)

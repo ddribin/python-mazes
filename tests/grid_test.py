@@ -159,11 +159,65 @@ class TestGrid:
         assert grid_3x3.center == (1, 1)
         assert grid_4x4.center == (2, 2)
 
-    def test_has_direction(self):
+    def test_valid_direction(self):
         grid = Grid(3, 3)
 
+        #     0   1   2
+        #   +---+---+---+
+        # 0 |   |   |   |
+        #   +---+---+---+
+        # 1 |   | X |   |
+        #   +---+---+---+
+        # 2 |   |   |   |
+        #   +---+---+---+
         assert grid.valid_directions(grid.northwest_corner) == D.E | D.S
         assert grid.valid_directions(grid.northeast_corner) == D.W | D.S
         assert grid.valid_directions(grid.southwest_corner) == D.E | D.N
         assert grid.valid_directions(grid.southeast_corner) == D.W | D.N
         assert grid.valid_directions(grid.center) == D.N | D.S | D.E | D.W
+
+    def test_valid_direction_after_linking(self):
+        grid = Grid(3, 3)
+        grid.link((1, 1), D.N | D.W)
+
+        #     0   1   2
+        #   +---+---+---+
+        # 0 |   |   |   |
+        #   +---+---+---+
+        # 1 |   | X |   |
+        #   +---+---+---+
+        # 2 |   |   |   |
+        #   +---+---+---+
+        assert grid.valid_directions(grid.northwest_corner) == D.E | D.S
+        assert grid.valid_directions(grid.northeast_corner) == D.W | D.S
+        assert grid.valid_directions(grid.southwest_corner) == D.E | D.N
+        assert grid.valid_directions(grid.southeast_corner) == D.W | D.N
+        assert grid.valid_directions(grid.center) == D.N | D.S | D.E | D.W
+
+    def test_available_directions_on_empty(self) -> None:
+        grid = Grid(3, 3)
+
+        all_dirs = D.N | D.S | D.E | D.W
+        assert grid.available_directions((1, 1)) == all_dirs
+        assert grid.available_directions((1, 0)) == all_dirs & ~D.N
+        assert grid.available_directions((1, 2)) == all_dirs & ~D.S
+        assert grid.available_directions((0, 1)) == all_dirs & ~D.W
+        assert grid.available_directions((2, 1)) == all_dirs & ~D.E
+
+    def test_available_directions_after_linking(self) -> None:
+        grid = Grid(3, 3)
+        grid.link((1, 1), D.N | D.W)
+
+        #     0   1   2
+        #   +---+---+---+
+        # 0 |   |   |   |
+        #   +---+   +---+
+        # 1 |     X |   |
+        #   +---+---+---+
+        # 2 |   |   |   |
+        #   +---+---+---+
+        assert grid.available_directions((1, 1)) == D.E | D.S
+        assert grid.available_directions((1, 0)) == D.E | D.W
+        assert grid.available_directions((1, 2)) == D.E | D.W
+        assert grid.available_directions((0, 1)) == D.N | D.S
+        assert grid.available_directions((2, 1)) == D.N | D.S
