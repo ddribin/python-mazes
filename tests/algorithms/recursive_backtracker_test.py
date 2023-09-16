@@ -1,10 +1,8 @@
-from pprint import pp
-
 from mazes.algorithms import RecursiveBacktracker, RecursiveBacktrackerRandom
 from mazes.algorithms.utils import flatten
 from mazes.direction import Direction as D
 from mazes.grid import Coordinate, Grid, ImmutableGrid
-from mazes.maze_generator import MazeOperation, MutableMazeState
+from mazes.maze_generator import MazeOperation, MazeOpStep, MutableMazeState
 from mazes.renderers import TextRenderer
 
 from ..asserts import assert_render
@@ -64,6 +62,11 @@ class TestRecursiveBacktracker:
         for op in algo.operations():
             saved_ops.append(op)
             state.apply_operation(op)
+            print(f"{op}")
+            if isinstance(op, MazeOpStep):
+                print(f"{state.run=}")
+                print(f"{state.target_coordinates=}")
+                print("---")
 
         text = TextRenderer.render_grid(grid)
 
@@ -79,7 +82,6 @@ class TestRecursiveBacktracker:
             +---+---+---+---+
             """
         assert_render(text, expected)
-        pp(saved_ops)
 
     def render_grid(self, grid: Grid, start: Coordinate, directions: list[D]) -> str:
         random = FakeRecursiveBacktrackerRandom(start, directions)

@@ -83,6 +83,11 @@ class MazeOpSetTargetDirs:
     directions: Direction
 
 
+@dataclass(frozen=True)
+class MazeOpStep:
+    pass
+
+
 MazeOperation = (
     MazeOpPushRun
     | MazeOpPopRun
@@ -91,7 +96,9 @@ MazeOperation = (
     | MazeOpSetRun
     | MazeOpSetTargetCoords
     | MazeOpSetTargetDirs
+    | MazeOpStep
 )
+
 
 MazeOperations = list[MazeOperation]
 
@@ -151,9 +158,9 @@ class MutableMazeState(MazeState):
                 return MazeOpPushRun(old_head)
 
             case MazeOpSetRun(val):
-                old_run = self._run
+                prev_run = self._run
                 self._run = val
-                return MazeOpSetRun(old_run)
+                return MazeOpSetRun(prev_run)
 
             case MazeOpGridLink(coord, dir):
                 self._grid.link(coord, dir)
@@ -164,14 +171,17 @@ class MutableMazeState(MazeState):
                 return MazeOpGridLink(coord, dir)
 
             case MazeOpSetTargetCoords(val):
-                old_targets = self._target_coordinates
+                prev_targets = self._target_coordinates
                 self._target_coordinates = val
-                return MazeOpSetTargetCoords(old_targets)
+                return MazeOpSetTargetCoords(prev_targets)
 
             case MazeOpSetTargetDirs(dirs):
-                old_dirs = self._target_directions
+                prev_dirs = self._target_directions
                 self._target_directions = dirs
-                return MazeOpSetTargetDirs(old_dirs)
+                return MazeOpSetTargetDirs(prev_dirs)
+
+            case MazeOpStep():
+                return operation
 
             case _:
                 assert_never(operation)

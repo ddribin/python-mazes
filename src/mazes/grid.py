@@ -51,8 +51,7 @@ class ImmutableGrid(Protocol):
 
     def available_directions(self, coord: Coordinate) -> Direction:
         available_directions = Direction.Empty
-        valid_dirs = self.valid_directions(coord)
-        for dir in valid_dirs:
+        for dir in self.valid_directions(coord):
             next_coord = dir.update_coordinate(coord)
             if self[next_coord] is Direction.Empty:
                 available_directions |= dir

@@ -171,7 +171,7 @@ class TestMazeGenerator:
     def test_multiple_undo(self) -> None:
         state = self.make_state()
 
-        ops = [
+        ops: MazeOperations = [
             MazeOpSetTargetCoords([(1, 0), (0, 1)]),
             MazeOpPushRun((1, 0)),
             MazeOpGridLink((0, 0), D.E),

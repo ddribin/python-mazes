@@ -6,10 +6,12 @@ from ..direction import Direction
 from ..grid import Coordinate, Grid, ImmutableGrid
 from ..maze_generator import (
     MazeOperation,
+    MazeOperations,
     MazeOpGridLink,
     MazeOpPopRun,
     MazeOpPushRun,
     MazeOpSetTargetCoords,
+    MazeOpStep,
     MazeState,
 )
 from .algorithm import Algorithm
@@ -90,6 +92,21 @@ class RecursiveBacktracker(Algorithm):
     def send_op(self, op: MazeOperation) -> Iterator[MazeOperation]:
         yield op
 
+    def operation_steps(
+        self, operations: Iterator[MazeOperation]
+    ) -> Iterator[MazeOperations]:
+        step: MazeOperations = []
+        for op in operations:
+            match op:
+                case MazeOpStep():
+                    print(f"{step=}")
+                    yield step
+                    step = []
+
+                case _:
+                    print(f"{op=}")
+                    step.append(op)
+
     def operations(self) -> Iterator[MazeOperation]:
         state = self._state
         assert state is not None
@@ -97,30 +114,28 @@ class RecursiveBacktracker(Algorithm):
         stack = state.run
         random = self._random
 
-        start_at: Coordinate | None = random.random_coordinate(grid)
+        start_at = random.random_coordinate(grid)
         yield MazeOpPushRun(start_at)
 
         while stack:
             current = stack[-1]
             available_directions = grid.available_directions(current)
-            self._logger.debug(
-                "stack=%r available_directions=%r targets=%r",
-                stack,
-                available_directions,
-                state.target_coordinates,
-            )
 
             if not available_directions:
                 yield MazeOpSetTargetCoords([])
+                yield MazeOpStep()
                 yield MazeOpPopRun()
             else:
+                targets = self.targets_from_directions(current, available_directions)
+                yield MazeOpSetTargetCoords(targets)
+                yield MazeOpStep()
+
                 next_direction = random.choose_direction(available_directions)
                 next_coord = next_direction.update_coordinate(current)
-                targets = self.targets_from_directions(current, available_directions)
-
                 yield MazeOpGridLink(current, next_direction)
                 yield MazeOpPushRun(next_coord)
-                yield MazeOpSetTargetCoords(targets)
+
+        yield MazeOpStep()
 
     def targets_from_directions(
         self, coord: Coordinate, directions: Direction
