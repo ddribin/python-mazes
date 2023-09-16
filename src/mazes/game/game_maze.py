@@ -11,6 +11,8 @@ from mazes import (
     Direction,
     Distances,
     MazeGenerator,
+    MazeOperation,
+    MazeOpStep,
     MazeOptions,
 )
 from mazes.algorithms import Dijkstra
@@ -75,6 +77,7 @@ class GameMaze:
         self._maze = MazeGenerator(options)
         print(f"Seed: {self._maze.seed}")
         self._maze_steps = self._maze.steps()
+        self._maze_operations = self._maze.operations()
         self._state = self.State.Generating
         self.generation_speed = 0
         self._dijkstra: Dijkstra | None = None
@@ -83,16 +86,34 @@ class GameMaze:
         self._pulse_gradient = ColorGradient((220, 50, 47), (235, 136, 134), 256)
         self._pulse_tick = 0
 
+        self._current: set[Coordinate] = set()
+        self._trail: set[Coordinate] = set()
+        self._targets: set[Coordinate] = set()
+
     def single_step(self) -> None:
         if self._state is self.State.Generating:
             self.single_step_generating()
         if self._state is self.State.Dijkstra:
             self.single_step_dijkstra()
 
+    def next_until_step(self, iter: Iterator[MazeOperation]) -> None:
+        while True:
+            operation = next(self._maze_operations)
+            if isinstance(operation, MazeOpStep):
+                run = self._maze.state.run
+                if len(run) > 0:
+                    self._current = {run[-1]}
+                else:
+                    self._current = set()
+                self._trail = set(run)
+                self._targets = set(self._maze.state.target_coordinates)
+                break
+            self._maze.apply_operation(operation)
+
     def single_step_generating(self) -> None:
         try:
             self._pulse_tick = 0
-            next(self._maze_steps)
+            self.next_until_step(self._maze_operations)
         except StopIteration:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
@@ -119,7 +140,7 @@ class GameMaze:
     def update_generating(self) -> None:
         try:
             for _ in range(self.generation_speed * 3):
-                next(self._maze_steps)
+                self.next_until_step(self._maze_operations)
         except StopIteration:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
@@ -208,15 +229,14 @@ class GameMaze:
         return None
 
     def background_color_of_cursor(self, coord: Coordinate) -> Color | None:
-        alg = self._maze._algorithm
-        if coord in alg.current:
+        if coord in self._current:
             val = self._pulse_tick % 512
             if val > 255:
                 val = 255 - (val - 256)
             return self._pulse_gradient.interpolate(val)
-        elif coord in alg.trail:
+        elif coord in self._trail:
             return (211, 54, 130)
-        elif coord in alg.targets:
+        elif coord in self._targets:
             return (181, 137, 0)
         else:
             return None

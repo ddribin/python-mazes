@@ -47,6 +47,7 @@ class GameLoop:
         self._player = pg.Rect((300, 250, 50, 50))
         self._maze = GameMaze(24 * 3 // 2, 18 * 3 // 2, self.width, self.height, 20, 20)
         self._step_timer: int | None = None
+        self._step_prev_timer: int | None = None
         self._reset_key_down = False
         self._jump_key_down = False
 

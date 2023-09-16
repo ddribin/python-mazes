@@ -3,7 +3,7 @@ import pytest
 from mazes import AlgorithmType
 from mazes import Direction as D
 from mazes import Grid, MazeOptions
-from mazes.maze_generator import (
+from mazes.maze_state import (
     MazeOperations,
     MazeOpGridLink,
     MazeOpGridUnlink,

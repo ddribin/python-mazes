@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 from ..direction import Direction
 from ..grid import Coordinate, Grid, ImmutableGrid
-from ..maze_generator import (
+from ..maze_state import (
     MazeOperation,
     MazeOperations,
     MazeOpGridLink,
