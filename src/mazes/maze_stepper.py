@@ -9,10 +9,32 @@ class MazeStepper:
     ) -> None:
         self._state = state
         self._operations = operations
+        self._previous_operations: list[MazeOperation] = []
+        self._previous_index = 0
 
     def step_forward(self) -> None:
         while self._step_operation():
             pass
+
+    def _pull_step(self) -> list[MazeOperation]:
+        step: list[MazeOperation] = []
+        while True:
+            op = self._next_operation()
+            if op is not None:
+                step.append(op)
+            else:
+                break
+
+        return step
+
+    def _next_operation(self) -> MazeOperation | None:
+        op = next(self._operations)
+        match op:
+            case MazeOpStep():
+                return None
+
+            case _:
+                return op
 
     def _step_operation(self) -> bool:
         op = next(self._operations)
