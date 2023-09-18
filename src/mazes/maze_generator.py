@@ -15,7 +15,7 @@ class AlgorithmType(Enum):
     RecursiveBacktracker = auto()
 
 
-@dataclass
+@dataclass(slots=True)
 class MazeOptions:
     width: int
     height: int

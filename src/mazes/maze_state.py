@@ -5,44 +5,44 @@ from typing import assert_never
 from . import Coordinate, Direction, Distances, Grid, ImmutableDistances, ImmutableGrid
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpPushRun:
     val: Coordinate
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpPopRun:
     pass
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpSetRun:
     val: list[Coordinate] = field(default_factory=list)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpGridLink:
     coordinate: Coordinate
     direction: Direction
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpGridUnlink:
     coordinate: Coordinate
     direction: Direction
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpSetTargetCoords:
     val: list[Coordinate] = field(default_factory=list)
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpSetTargetDirs:
     directions: Direction
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class MazeOpStep:
     pass
 

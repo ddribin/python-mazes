@@ -12,6 +12,7 @@ class Direction(IntFlag):
     S = auto()
     E = auto()
     W = auto()
+    All = N | S | E | W
 
     def opposite(self) -> Direction:
         match self:

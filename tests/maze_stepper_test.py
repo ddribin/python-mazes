@@ -10,6 +10,54 @@ class TestMazeStepper:
         grid = Grid(4, 4)
         state = MutableMazeState(grid, (0, 0))
         ops: list[MazeOperation] = [
+            MazeOpGridLink((0, 0), D.E),
+            MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+        ]
+        stepper = MazeStepper(state, iter(ops))
+
+        stepper.step_forward()
+
+        assert grid.available_directions((0, 0)) == D.S
+        assert state.run == [(0, 1)]
+
+    def test_step_backward_one(self) -> None:
+        grid = Grid(4, 4)
+        state = MutableMazeState(grid, (0, 0))
+        ops: list[MazeOperation] = [
+            MazeOpGridLink((0, 0), D.E),
+            MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+        ]
+        stepper = MazeStepper(state, iter(ops))
+
+        stepper.step_forward()
+        stepper.step_backward()
+
+        assert grid.available_directions((0, 0)) == D.S | D.E
+        assert state.run == []
+
+    def test_step_backward_then_forward(self) -> None:
+        grid = Grid(4, 4)
+        state = MutableMazeState(grid, (0, 0))
+        ops: list[MazeOperation] = [
+            MazeOpGridLink((0, 0), D.E),
+            MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+        ]
+        stepper = MazeStepper(state, iter(ops))
+
+        stepper.step_forward()
+        stepper.step_backward()
+        stepper.step_forward()
+
+        assert grid.available_directions((0, 0)) == D.S
+        assert state.run == [(0, 1)]
+
+    def test_step_forward_multiple(self) -> None:
+        grid = Grid(4, 4)
+        state = MutableMazeState(grid, (0, 0))
+        ops: list[MazeOperation] = [
             # Step 1
             MazeOpGridLink((0, 0), D.E),
             MazeOpPushRun((0, 1)),
@@ -30,19 +78,58 @@ class TestMazeStepper:
         with pytest.raises(StopIteration):
             stepper.step_forward()
 
-    @pytest.mark.skip()
-    def test_step_backward_one(self) -> None:
+    def test_step_forward_multiple_then_backward(self) -> None:
         grid = Grid(4, 4)
         state = MutableMazeState(grid, (0, 0))
         ops: list[MazeOperation] = [
+            # Step 1
             MazeOpGridLink((0, 0), D.E),
             MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+            # Step 2
+            MazeOpPushRun((0, 2)),
             MazeOpStep(),
         ]
         stepper = MazeStepper(state, iter(ops))
 
         stepper.step_forward()
-        stepper.step_backward()
+        stepper.step_forward()
 
-        assert grid.available_directions((0, 0)) == D.Empty
+        assert grid.available_directions((0, 0)) == D.S
+        assert state.run == [(0, 1), (0, 2)]
+
+        stepper.step_backward()
+        assert grid.available_directions((0, 0)) == D.S
+        assert state.run == [(0, 1)]
+
+        stepper.step_backward()
+        assert grid.available_directions((0, 0)) == D.S | D.E
         assert state.run == []
+
+    def test_step_forward_then_backward_then_forward(self) -> None:
+        grid = Grid(4, 4)
+        state = MutableMazeState(grid, (0, 0))
+        ops: list[MazeOperation] = [
+            # Step 1
+            MazeOpGridLink((0, 0), D.E),
+            MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+            # Step 2
+            MazeOpPushRun((0, 2)),
+            MazeOpStep(),
+            # Step 3
+            MazeOpPushRun((1, 2)),
+            MazeOpStep(),
+        ]
+        stepper = MazeStepper(state, iter(ops))
+
+        stepper.step_forward()
+        stepper.step_forward()
+        stepper.step_backward()
+        stepper.step_backward()
+        stepper.step_forward()
+        stepper.step_forward()
+        stepper.step_forward()
+
+        assert grid.available_directions((0, 0)) == D.S
+        assert state.run == [(0, 1), (0, 2), (1, 2)]
