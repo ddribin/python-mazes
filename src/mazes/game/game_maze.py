@@ -95,23 +95,24 @@ class GameMaze:
         run = self._maze.state.run
         if len(run) > 0:
             self._current = {run[-1]}
+            self._trail = set(run[:-1])
         else:
             self.current = set()
-        self._trail = set(self._maze.state.run)
+            self._trail = set()
         self._targets = set(self._maze.state.target_coordinates)
 
-    def single_step(self) -> None:
+    def single_step_forward(self) -> None:
         if self._state is self.State.Generating:
             self.single_step_generating()
         if self._state is self.State.Dijkstra:
             self.single_step_dijkstra()
 
     def single_step_generating(self) -> None:
-        try:
-            self._pulse_tick = 0
-            self._maze_stepper.step_forward()
-            self.update_cursors()
-        except StopIteration:
+        self._pulse_tick = 0
+        did_step = self._maze_stepper.step_forward()
+        self.update_cursors()
+
+        if not did_step:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
 
@@ -123,6 +124,18 @@ class GameMaze:
         except StopIteration:
             self.logger.info("Dijkstra done!")
             self.setup_done()
+
+    def single_step_backward(self) -> None:
+        if self._state is self.State.Generating:
+            self.single_step_backward_generating()
+
+    def single_step_backward_generating(self) -> None:
+        self._pulse_tick = 0
+        did_step = self._maze_stepper.step_backward()
+        if did_step:
+            self.update_cursors()
+        else:
+            self.clear_cursors()
 
     def update(self) -> None:
         if self._state is self.State.Generating:

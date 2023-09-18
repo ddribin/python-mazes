@@ -5,6 +5,56 @@ import pygame as pg
 from .game_maze import GameMaze
 
 
+class InputButton:
+    def __init__(self, key) -> None:
+        self._key = key
+        self._key_down = False
+
+    def update(self) -> bool:
+        """
+        Return `True` if key is down
+        """
+        key = pg.key.get_pressed()
+        key_down = key[self._key]
+        trigger = False
+        if key_down and not self._key_down:
+            trigger = True
+        self._key_down = key_down
+        return trigger
+
+
+class RepeatingInputButton:
+    def __init__(self, key) -> None:
+        self._key = key
+        self._key_down = False
+        self._timer: int | None = None
+
+    def update(self) -> bool:
+        """
+        Return `True` if key is down
+        """
+        keys = pg.key.get_pressed()
+        key_down = keys[self._key]
+        if key_down:
+            return self._tick_timer()
+        else:
+            self._timer = None
+            return False
+
+    def _tick_timer(self):
+        trigger = False
+        if self._timer is None:
+            self._timer = 60
+            trigger = True
+        else:
+            if self._timer == 0:
+                trigger = True
+                self._timer = 5
+            else:
+                self._timer -= 1
+        return trigger
+
+
 class GameLoop:
     def __init__(self) -> None:
         self._running = True
@@ -46,10 +96,11 @@ class GameLoop:
     def init(self) -> None:
         self._player = pg.Rect((300, 250, 50, 50))
         self._maze = GameMaze(24 * 3 // 2, 18 * 3 // 2, self.width, self.height, 20, 20)
-        self._step_timer: int | None = None
-        self._step_prev_timer: int | None = None
-        self._reset_key_down = False
-        self._jump_key_down = False
+        self._reset_button = InputButton(pg.K_r)
+        self._jump_button = InputButton(pg.K_j)
+        self._next_button = RepeatingInputButton(pg.K_RIGHT)
+        self._prev_button = RepeatingInputButton(pg.K_LEFT)
+        self._quit_button = InputButton(pg.K_q)
 
     def update(self) -> None:
         for event in pg.event.get():
@@ -59,9 +110,7 @@ class GameLoop:
         self._maze.update()
 
         key = pg.key.get_pressed()
-        old_reset_key_down = self._reset_key_down
-        self._reset_key_down = key[pg.K_r]
-        if not old_reset_key_down and self._reset_key_down:
+        if self._reset_button.update():
             self._maze.reset()
 
         if key[pg.K_SPACE]:
@@ -69,27 +118,14 @@ class GameLoop:
         else:
             self._maze.generation_speed = 0
 
-        old_jump_key_down = self._jump_key_down
-        self._jump_key_down = key[pg.K_j]
-        if not old_jump_key_down and self._jump_key_down:
+        if self._jump_button.update():
             self._maze.run_to_completion()
-        if key[pg.K_RIGHT]:
-            self.tick_single_step_timer()
-        else:
-            self._step_timer = None
-        if key[pg.K_q]:
+        if self._next_button.update():
+            self._maze.single_step_forward()
+        if self._prev_button.update():
+            self._maze.single_step_backward()
+        if self._quit_button.update():
             self._running = False
-
-    def tick_single_step_timer(self):
-        if self._step_timer is None:
-            self._step_timer = 60
-            self._maze.single_step()
-        else:
-            if self._step_timer == 0:
-                self._maze.single_step()
-                self._step_timer = 5
-            else:
-                self._step_timer -= 1
 
     def draw(self) -> None:
         screen = self._screen
