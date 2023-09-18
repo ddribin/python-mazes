@@ -84,19 +84,14 @@ class GameMaze:
         self._pulse_gradient = ColorGradient((220, 50, 47), (235, 136, 134), 256)
         self._pulse_tick = 0
 
-        self._current: set[Coordinate] = set()
-        self._trail: set[Coordinate] = set()
-        self._targets: set[Coordinate] = set()
+        self.clear_cursors()
 
-    def single_step(self) -> None:
-        if self._state is self.State.Generating:
-            self.single_step_generating()
-        if self._state is self.State.Dijkstra:
-            self.single_step_dijkstra()
+    def clear_cursors(self) -> None:
+        self._current = set()
+        self._trail = set()
+        self._targets = set()
 
-    def next_until_step(self) -> None:
-        self._maze_stepper.step_forward()
-
+    def update_cursors(self) -> None:
         run = self._maze.state.run
         if len(run) > 0:
             self._current = {run[-1]}
@@ -105,10 +100,17 @@ class GameMaze:
         self._trail = set(self._maze.state.run)
         self._targets = set(self._maze.state.target_coordinates)
 
+    def single_step(self) -> None:
+        if self._state is self.State.Generating:
+            self.single_step_generating()
+        if self._state is self.State.Dijkstra:
+            self.single_step_dijkstra()
+
     def single_step_generating(self) -> None:
         try:
             self._pulse_tick = 0
-            self.next_until_step()
+            self._maze_stepper.step_forward()
+            self.update_cursors()
         except StopIteration:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
@@ -133,14 +135,20 @@ class GameMaze:
             self._pulse_tick += 9
 
     def update_generating(self) -> None:
-        try:
-            for _ in range(self.generation_speed * 3):
-                self.next_until_step()
-        except StopIteration:
+        did_step = True
+        for _ in range(self.generation_speed * 3):
+            did_step = self._maze_stepper.step_forward()
+            if not did_step:
+                break
+
+        if did_step:
+            self.update_cursors()
+        else:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
 
     def setup_dijkstra(self) -> None:
+        self.clear_cursors()
         self._dijkstra = Dijkstra(self._maze.grid, self._maze.start)
         self._dijkstra_steps = self._dijkstra.steps()
         self._state = self.State.Dijkstra
@@ -165,8 +173,7 @@ class GameMaze:
 
     def run_to_completion(self) -> None:
         if self._state is self.State.Generating:
-            for _ in self._maze_steps:
-                pass
+            self._maze_stepper.step_forward_until_end()
             self.setup_dijkstra()
         elif self._state is self.State.Dijkstra:
             assert self._dijkstra_steps is not None

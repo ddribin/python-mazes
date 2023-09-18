@@ -133,3 +133,48 @@ class TestMazeStepper:
 
         assert grid.available_directions((0, 0)) == D.S
         assert state.run == [(0, 1), (0, 2), (1, 2)]
+
+    def test_step_forward_until_end(self) -> None:
+        grid = Grid(4, 4)
+        state = MutableMazeState(grid, (0, 0))
+        ops: list[MazeOperation] = [
+            # Step 1
+            MazeOpGridLink((0, 0), D.E),
+            MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+            # Step 2
+            MazeOpPushRun((0, 2)),
+            MazeOpStep(),
+            # Step 3
+            MazeOpPushRun((1, 2)),
+            MazeOpStep(),
+        ]
+        stepper = MazeStepper(state, iter(ops))
+
+        stepper.step_forward_until_end()
+
+        assert grid.available_directions((0, 0)) == D.S
+        assert state.run == [(0, 1), (0, 2), (1, 2)]
+
+    def test_step_backward_until_end(self) -> None:
+        grid = Grid(4, 4)
+        state = MutableMazeState(grid, (0, 0))
+        ops: list[MazeOperation] = [
+            # Step 1
+            MazeOpGridLink((0, 0), D.E),
+            MazeOpPushRun((0, 1)),
+            MazeOpStep(),
+            # Step 2
+            MazeOpPushRun((0, 2)),
+            MazeOpStep(),
+            # Step 3
+            MazeOpPushRun((1, 2)),
+            MazeOpStep(),
+        ]
+        stepper = MazeStepper(state, iter(ops))
+
+        stepper.step_forward_until_end()
+        stepper.step_backward_until_end()
+
+        assert grid.available_directions((0, 0)) == D.S | D.E
+        assert state.run == []
