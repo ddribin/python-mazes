@@ -1,5 +1,3 @@
-import pytest
-
 from mazes import Direction as D
 from mazes import Grid, MazeOperation, MazeStepper, MutableMazeState
 from mazes.maze_state import MazeOpGridLink, MazeOpPushRun, MazeOpStep
@@ -75,8 +73,7 @@ class TestMazeStepper:
         stepper.step_forward()
         assert state.run == [(0, 1), (0, 2)]
 
-        with pytest.raises(StopIteration):
-            stepper.step_forward()
+        assert not stepper.step_forward()
 
     def test_step_forward_multiple_then_backward(self) -> None:
         grid = Grid(4, 4)

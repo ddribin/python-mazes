@@ -87,9 +87,9 @@ class GameMaze:
         self.clear_cursors()
 
     def clear_cursors(self) -> None:
-        self._current = set()
-        self._trail = set()
-        self._targets = set()
+        self._current: set[Coordinate] = set()
+        self._trail: set[Coordinate] = set()
+        self._targets: set[Coordinate] = set()
 
     def update_cursors(self) -> None:
         run = self._maze.state.run
@@ -97,7 +97,7 @@ class GameMaze:
             self._current = {run[-1]}
             self._trail = set(run[:-1])
         else:
-            self.current = set()
+            self._current = set()
             self._trail = set()
         self._targets = set(self._maze.state.target_coordinates)
 
