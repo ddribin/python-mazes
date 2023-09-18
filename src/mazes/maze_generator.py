@@ -7,6 +7,7 @@ from enum import Enum, auto
 
 from . import Coordinate, Grid, ImmutableGrid
 from .maze_state import MazeOperation, MazeState, MutableMazeState
+from .maze_stepper import MazeStepper
 
 
 class AlgorithmType(Enum):
@@ -102,6 +103,9 @@ class MazeGenerator:
     @property
     def targets(self) -> MazeState:
         return self._maze_state
+
+    def make_stepper(self) -> MazeStepper:
+        return MazeStepper(self._maze_state, self._algorithm.operations())
 
     def apply_operation(self, operation: MazeOperation) -> None:
         self._maze_state.apply_operation(operation)

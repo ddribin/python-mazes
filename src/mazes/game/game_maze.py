@@ -11,8 +11,6 @@ from mazes import (
     Direction,
     Distances,
     MazeGenerator,
-    MazeOperation,
-    MazeOpStep,
     MazeOptions,
 )
 from mazes.algorithms import Dijkstra
@@ -77,7 +75,7 @@ class GameMaze:
         self._maze = MazeGenerator(options)
         print(f"Seed: {self._maze.seed}")
         self._maze_steps = self._maze.steps()
-        self._maze_operations = self._maze.operations()
+        self._maze_stepper = self._maze.make_stepper()
         self._state = self.State.Generating
         self.generation_speed = 0
         self._dijkstra: Dijkstra | None = None
@@ -96,24 +94,21 @@ class GameMaze:
         if self._state is self.State.Dijkstra:
             self.single_step_dijkstra()
 
-    def next_until_step(self, iter: Iterator[MazeOperation]) -> None:
-        while True:
-            operation = next(self._maze_operations)
-            if isinstance(operation, MazeOpStep):
-                run = self._maze.state.run
-                if len(run) > 0:
-                    self._current = {run[-1]}
-                else:
-                    self._current = set()
-                self._trail = set(run)
-                self._targets = set(self._maze.state.target_coordinates)
-                break
-            self._maze.apply_operation(operation)
+    def next_until_step(self) -> None:
+        self._maze_stepper.step_forward()
+
+        run = self._maze.state.run
+        if len(run) > 0:
+            self._current = {run[-1]}
+        else:
+            self.current = set()
+        self._trail = set(self._maze.state.run)
+        self._targets = set(self._maze.state.target_coordinates)
 
     def single_step_generating(self) -> None:
         try:
             self._pulse_tick = 0
-            self.next_until_step(self._maze_operations)
+            self.next_until_step()
         except StopIteration:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
@@ -140,7 +135,7 @@ class GameMaze:
     def update_generating(self) -> None:
         try:
             for _ in range(self.generation_speed * 3):
-                self.next_until_step(self._maze_operations)
+                self.next_until_step()
         except StopIteration:
             self.logger.info("Maze done!")
             self.setup_dijkstra()

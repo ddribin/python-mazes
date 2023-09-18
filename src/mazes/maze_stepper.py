@@ -37,17 +37,6 @@ class MazeStepper:
         if step is not None:
             self._backward_steps.append(step)
 
-    def _pull_step(self) -> list[MazeOperation]:
-        step: list[MazeOperation] = []
-        while True:
-            op = self._next_generator_operation()
-            if op is not None:
-                step.append(op)
-            else:
-                break
-
-        return step
-
     def _next_generator_step(self) -> MazeStep | None:
         forward_ops: list[MazeOperation] = []
         backward_ops: list[MazeOperation] = []
@@ -76,16 +65,6 @@ class MazeStepper:
 
             case _:
                 return op
-
-    def _step_operation(self) -> bool:
-        op = next(self._generator)
-        match op:
-            case MazeOpStep():
-                return False
-
-            case _:
-                self._state.apply_operation(op)
-                return True
 
     def step_backward(self) -> None:
         if not self._backward_steps:
