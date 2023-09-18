@@ -5,54 +5,56 @@ import pygame as pg
 from .game_maze import GameMaze
 
 
-class InputButton:
-    def __init__(self, key) -> None:
-        self._key = key
-        self._key_down = False
+class ButtonInput:
+    def __init__(self) -> None:
+        self._is_down = False
+        self._triggered = False
 
-    def update(self) -> bool:
-        """
-        Return `True` if key is down
-        """
-        key = pg.key.get_pressed()
-        key_down = key[self._key]
-        trigger = False
-        if key_down and not self._key_down:
-            trigger = True
-        self._key_down = key_down
-        return trigger
+    @property
+    def is_triggered(self) -> bool:
+        return self._triggered
+
+    def __bool__(self) -> bool:
+        return self._triggered
+
+    def update(self, is_down: bool) -> None:
+        self._triggered = is_down and not self._is_down
+        self._is_down = is_down
 
 
-class RepeatingInputButton:
-    def __init__(self, key) -> None:
-        self._key = key
-        self._key_down = False
+class RepeatingButtonInput:
+    def __init__(self, delay=60, rate=5) -> None:
+        self._delay = delay
+        self._rate = rate
+        self._triggered = False
         self._timer: int | None = None
 
-    def update(self) -> bool:
-        """
-        Return `True` if key is down
-        """
-        keys = pg.key.get_pressed()
-        key_down = keys[self._key]
-        if key_down:
-            return self._tick_timer()
+    @property
+    def is_triggered(self) -> bool:
+        return self._triggered
+
+    def __bool__(self) -> bool:
+        return self._triggered
+
+    def update(self, is_down: bool) -> None:
+        if is_down:
+            self._triggered = self._tick_timer()
         else:
             self._timer = None
-            return False
+            self._triggered = False
 
-    def _tick_timer(self):
-        trigger = False
+    def _tick_timer(self) -> bool:
         if self._timer is None:
-            self._timer = 60
-            trigger = True
+            self._timer = self._delay
+            return True
         else:
             if self._timer == 0:
-                trigger = True
-                self._timer = 5
+                self._triggered = True
+                self._timer = self._rate
+                return True
             else:
                 self._timer -= 1
-        return trigger
+                return False
 
 
 class GameLoop:
@@ -96,11 +98,11 @@ class GameLoop:
     def init(self) -> None:
         self._player = pg.Rect((300, 250, 50, 50))
         self._maze = GameMaze(24 * 3 // 2, 18 * 3 // 2, self.width, self.height, 20, 20)
-        self._reset_button = InputButton(pg.K_r)
-        self._jump_button = InputButton(pg.K_j)
-        self._next_button = RepeatingInputButton(pg.K_RIGHT)
-        self._prev_button = RepeatingInputButton(pg.K_LEFT)
-        self._quit_button = InputButton(pg.K_q)
+        self._reset_key = ButtonInput()
+        self._quit_key = ButtonInput()
+        self._jump_key = ButtonInput()
+        self._next_key = RepeatingButtonInput()
+        self._prev_key = RepeatingButtonInput()
 
     def update(self) -> None:
         for event in pg.event.get():
@@ -109,22 +111,28 @@ class GameLoop:
 
         self._maze.update()
 
-        key = pg.key.get_pressed()
-        if self._reset_button.update():
+        keys = pg.key.get_pressed()
+        self._reset_key.update(keys[pg.K_r])
+        self._jump_key.update(keys[pg.K_RETURN])
+        self._quit_key.update(keys[pg.K_q])
+        self._next_key.update(keys[pg.K_f] or keys[pg.K_RIGHT])
+        self._prev_key.update(keys[pg.K_s] or keys[pg.K_LEFT])
+
+        if self._reset_key:
             self._maze.reset()
 
-        if key[pg.K_SPACE]:
+        if keys[pg.K_SPACE]:
             self._maze.generation_speed = 1
         else:
             self._maze.generation_speed = 0
 
-        if self._jump_button.update():
+        if self._jump_key:
             self._maze.run_to_completion()
-        if self._next_button.update():
+        if self._next_key:
             self._maze.single_step_forward()
-        if self._prev_button.update():
+        if self._prev_key:
             self._maze.single_step_backward()
-        if self._quit_button.update():
+        if self._quit_key:
             self._running = False
 
     def draw(self) -> None:
