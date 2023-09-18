@@ -149,16 +149,31 @@ class GameMaze:
 
     def update_generating(self) -> None:
         did_step = True
-        for _ in range(self.generation_speed * 3):
-            did_step = self._maze_stepper.step_forward()
-            if not did_step:
-                break
+        if self.generation_speed > 0:
+            did_step = self.update_generating_forward()
+        if self.generation_speed < 0:
+            did_step = self.update_generating_backward()
 
         if did_step:
             self.update_cursors()
         else:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
+
+    def update_generating_forward(self) -> bool:
+        did_step = True
+        for _ in range(self.generation_speed * 3):
+            did_step = self._maze_stepper.step_forward()
+            if not did_step:
+                break
+        return did_step
+
+    def update_generating_backward(self) -> bool:
+        for _ in range(abs(self.generation_speed) * 3):
+            did_step = self._maze_stepper.step_backward()
+            if not did_step:
+                break
+        return True
 
     def setup_dijkstra(self) -> None:
         self.clear_cursors()

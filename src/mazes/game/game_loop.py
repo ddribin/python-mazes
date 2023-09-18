@@ -121,8 +121,10 @@ class GameLoop:
         if self._reset_key:
             self._maze.reset()
 
-        if keys[pg.K_SPACE]:
+        if keys[pg.K_l] or keys[pg.K_SPACE]:
             self._maze.generation_speed = 1
+        elif keys[pg.K_j]:
+            self._maze.generation_speed = -1
         else:
             self._maze.generation_speed = 0
 
