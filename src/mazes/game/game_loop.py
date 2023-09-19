@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 
 import pygame as pg
 
@@ -57,6 +58,21 @@ class RepeatingButtonInput:
                 return False
 
 
+@dataclass(slots=True)
+class JoystickState:
+    a_button: bool = False
+    b_button: bool = False
+    x_button: bool = False
+    y_button: bool = False
+    l_button: bool = False
+    r_button: bool = False
+    plus_button: bool = False
+    dpad_left: bool = False
+    dpad_right: bool = False
+    dpad_up: bool = False
+    dpad_down: bool = False
+
+
 class GameLoop:
     def __init__(self) -> None:
         self._running = True
@@ -75,6 +91,7 @@ class GameLoop:
             SCREENRECT.size, winstyle, bestdepth, vsync=1
         )
         clock = pg.time.Clock()
+        pg.joystick.init()
         self.init()
 
         # Main loop
@@ -104,35 +121,87 @@ class GameLoop:
         self._next_key = RepeatingButtonInput()
         self._prev_key = RepeatingButtonInput()
 
+        self._reset_button = ButtonInput()
+        self._jump_button = ButtonInput()
+        self._next_button = RepeatingButtonInput()
+        self._prev_button = RepeatingButtonInput()
+        self._joystick_state = JoystickState()
+        self._joysticks = {}
+
     def update(self) -> None:
+        joystick_state = self._joystick_state
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self._running = False
+
+            if event.type == pg.JOYBUTTONDOWN or event.type == pg.JOYBUTTONUP:
+                down = event.type == pg.JOYBUTTONDOWN
+                if event.button == 0:
+                    joystick_state.a_button = down
+                elif event.button == 1:
+                    joystick_state.b_button = down
+                elif event.button == 2:
+                    joystick_state.x_button = down
+                elif event.button == 3:
+                    joystick_state.y_button = down
+                elif event.button == 6:
+                    joystick_state.plus_button = down
+                elif event.button == 9:
+                    joystick_state.l_button = down
+                elif event.button == 10:
+                    joystick_state.r_button = down
+                elif event.button == 13:
+                    joystick_state.dpad_left = down
+                elif event.button == 14:
+                    joystick_state.dpad_right = down
+                elif event.button == 11:
+                    joystick_state.dpad_up = down
+                elif event.button == 12:
+                    joystick_state.dpad_down = down
+
+            if event.type == pg.JOYDEVICEADDED:
+                joy = pg.joystick.Joystick(event.device_index)
+                self._joysticks[joy.get_instance_id()] = joy
+                print(f"Joystick {joy.get_instance_id()} connected")
+
+            if event.type == pg.JOYDEVICEREMOVED:
+                if event.instance_id in self._joysticks:
+                    del self._joysticks[event.instance_id]
+                    print(f"Joystick {event.instance_id} disconnected")
+                else:
+                    print(
+                        f"Tried to disconnect Joystick {event.instance_id}, "
+                        "but couldn't find it in the joystick list"
+                    )
 
         self._maze.update()
 
         keys = pg.key.get_pressed()
         self._reset_key.update(keys[pg.K_r])
+        self._reset_button.update(joystick_state.plus_button)
         self._jump_key.update(keys[pg.K_RETURN])
         self._quit_key.update(keys[pg.K_q])
         self._next_key.update(keys[pg.K_f] or keys[pg.K_RIGHT])
+        self._next_button.update(joystick_state.r_button)
         self._prev_key.update(keys[pg.K_s] or keys[pg.K_LEFT])
+        self._prev_button.update(joystick_state.l_button)
 
-        if self._reset_key:
+        if self._reset_key or self._reset_button:
             self._maze.reset()
 
-        if keys[pg.K_l] or keys[pg.K_SPACE]:
+        if keys[pg.K_l] or keys[pg.K_SPACE] or joystick_state.dpad_right:
             self._maze.generation_speed = 1
-        elif keys[pg.K_j]:
+        elif keys[pg.K_j] or joystick_state.dpad_left:
             self._maze.generation_speed = -1
         else:
             self._maze.generation_speed = 0
 
         if self._jump_key:
             self._maze.run_to_completion()
-        if self._next_key:
+        if self._next_key or self._next_button:
             self._maze.single_step_forward()
-        if self._prev_key:
+        if self._prev_key or self._prev_button:
             self._maze.single_step_backward()
         if self._quit_key:
             self._running = False
