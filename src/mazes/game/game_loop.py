@@ -1,4 +1,5 @@
 import logging
+import math
 from dataclasses import dataclass
 
 import pygame as pg
@@ -71,6 +72,8 @@ class JoystickState:
     dpad_right: bool = False
     dpad_up: bool = False
     dpad_down: bool = False
+    lstick_horizontal: float = 0.0
+    lstick_vertical: float = 0.0
 
 
 class GameLoop:
@@ -127,6 +130,7 @@ class GameLoop:
         self._prev_button = RepeatingButtonInput()
         self._joystick_state = JoystickState()
         self._joysticks = {}
+        self._max_analog_speed = 10.0
 
     def update(self) -> None:
         joystick_state = self._joystick_state
@@ -159,6 +163,12 @@ class GameLoop:
                     joystick_state.dpad_up = down
                 elif event.button == 12:
                     joystick_state.dpad_down = down
+
+            if event.type == pg.JOYAXISMOTION:
+                if event.axis == 0:
+                    joystick_state.lstick_horizontal = event.value
+                elif event.axis == 1:
+                    joystick_state.lstick_vertical = event.value
 
             if event.type == pg.JOYDEVICEADDED:
                 joy = pg.joystick.Joystick(event.device_index)
@@ -195,7 +205,17 @@ class GameLoop:
         elif keys[pg.K_j] or joystick_state.dpad_left:
             self._maze.generation_speed = -1
         else:
-            self._maze.generation_speed = 0
+            dir = math.copysign(1.0, joystick_state.lstick_horizontal)
+            speed = abs(joystick_state.lstick_horizontal)
+            scaled = 0.0
+            if speed >= 0.10 and speed < 0.60:
+                scaled = 1.0
+            elif speed >= 0.60 and speed < 0.80:
+                scaled = 2.0
+            elif speed >= 0.80:
+                scaled = 3.0
+            analog_speed = dir * scaled
+            self._maze.generation_speed = round(analog_speed)
 
         if self._jump_key:
             self._maze.run_to_completion()
