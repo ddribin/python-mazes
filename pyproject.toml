@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
     "typing_extensions ~= 4.7.0",
     "Pillow ~= 10.0.0",
-    "pygame ~= 2.5.0",
+    "pygame-ce ~= 2.3.0",
 ]
 
 [project.optional-dependencies]
