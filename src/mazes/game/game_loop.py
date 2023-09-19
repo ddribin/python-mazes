@@ -129,7 +129,7 @@ class GameLoop:
         self._next_button = RepeatingButtonInput()
         self._prev_button = RepeatingButtonInput()
         self._joystick_state = JoystickState()
-        self._joysticks = {}
+        self._joysticks: dict[int, pg.joystick.JoystickType] = {}
         self._max_analog_speed = 10.0
 
     def update(self) -> None:
