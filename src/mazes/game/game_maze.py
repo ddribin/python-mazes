@@ -219,7 +219,7 @@ class GameMaze:
 
     def setup_done(self) -> None:
         assert self._dijkstra is not None
-        print(f"{self._maze.start} {self._maze.end}")
+        self.logger.info("Start %r -> End: %r", self._maze.start, self._maze.end)
         goal = self._maze.end
         self._path_distances = self._dijkstra.path_to(goal)
         self._state = self.State.Done

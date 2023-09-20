@@ -130,7 +130,7 @@ class GameLoop:
         self._prev_button = RepeatingButtonInput()
         self._joystick_state = JoystickState()
         self._joysticks: dict[int, pg.joystick.JoystickType] = {}
-        self._max_analog_speed = 100.0 ** (1.0 / 3)
+        self._max_analog_speed = 100.0 ** (1.0 / 4)
 
     def update(self) -> None:
         joystick_state = self._joystick_state
@@ -223,7 +223,7 @@ class GameLoop:
         scaled = 0
         if speed > 0.30:
             remapped_speed = utils.fremap(0.1, 1.0, 0.0, self._max_analog_speed, speed)
-            scaled = round(remapped_speed**3.0)
+            scaled = round(remapped_speed**4.0)
         analog_speed = dir * scaled
         self._maze.generation_velocity = analog_speed
 
