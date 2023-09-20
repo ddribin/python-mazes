@@ -40,7 +40,6 @@ class GameMaze:
         self._screen_height = screen_height
         self._padding_x = padding_x
         self._padding_y = padding_y
-        self.generation_speed = 0
 
         self._cell_width = math.floor((screen_width - padding_x * 2) / grid_width)
         self._cell_height = math.floor((screen_height - padding_y * 2) / grid_height)
@@ -77,7 +76,11 @@ class GameMaze:
         self._maze_steps = self._maze.steps()
         self._maze_stepper = self._maze.make_stepper()
         self._state = self.State.Generating
-        self.generation_speed = 0
+        self._generation_speed = 0
+        self._generation_speed_sign = 1
+        self._generation_timer = 0
+        self._generation_timer_steps = 0
+        self._generation_timer_multiplier = 3
         self._dijkstra: Dijkstra | None = None
         self._dijkstra_steps: Iterator[None] | None = None
         self._path_distances: Distances | None = None
@@ -85,6 +88,19 @@ class GameMaze:
         self._pulse_tick = 0
 
         self.clear_cursors()
+
+    @property
+    def generation_velocity(self) -> int:
+        return self._generation_speed * self._generation_speed_sign
+
+    @generation_velocity.setter
+    def generation_velocity(self, velocity: int) -> None:
+        if velocity >= 0:
+            self._generation_speed = velocity
+            self._generation_speed_sign = 1
+        else:
+            self._generation_speed = velocity * -1
+            self._generation_speed_sign = -1
 
     def clear_cursors(self) -> None:
         self._current: set[Coordinate] = set()
@@ -138,6 +154,7 @@ class GameMaze:
             self.clear_cursors()
 
     def update(self) -> None:
+        self.update_generation_timer()
         if self._state is self.State.Generating:
             self.update_generating()
         if self._state is self.State.Dijkstra:
@@ -147,11 +164,18 @@ class GameMaze:
         else:
             self._pulse_tick += 9
 
+    def update_generation_timer(self) -> None:
+        self._generation_timer += (
+            self._generation_speed * self._generation_timer_multiplier
+        )
+        self._generation_timer_steps = self._generation_timer // 100
+        self._generation_timer %= 100
+
     def update_generating(self) -> None:
         did_step = True
-        if self.generation_speed > 0:
+        if self._generation_speed_sign > 0:
             did_step = self.update_generating_forward()
-        if self.generation_speed < 0:
+        if self._generation_speed_sign < 0:
             did_step = self.update_generating_backward()
 
         if did_step:
@@ -162,14 +186,14 @@ class GameMaze:
 
     def update_generating_forward(self) -> bool:
         did_step = True
-        for _ in range(self.generation_speed * 3):
+        for _ in range(self._generation_timer_steps):
             did_step = self._maze_stepper.step_forward()
             if not did_step:
                 break
         return did_step
 
     def update_generating_backward(self) -> bool:
-        for _ in range(abs(self.generation_speed) * 3):
+        for _ in range(self._generation_timer_steps):
             did_step = self._maze_stepper.step_backward()
             if not did_step:
                 break
@@ -177,6 +201,7 @@ class GameMaze:
 
     def setup_dijkstra(self) -> None:
         self.clear_cursors()
+        self._generation_timer_multiplier = 1
         self._dijkstra = Dijkstra(self._maze.grid, self._maze.start)
         self._dijkstra_steps = self._dijkstra.steps()
         self._state = self.State.Dijkstra
@@ -185,7 +210,7 @@ class GameMaze:
 
     def update_dijkstra(self) -> None:
         try:
-            for _ in range(self.generation_speed):
+            for _ in range(self._generation_timer_steps):
                 assert self._dijkstra_steps is not None
                 next(self._dijkstra_steps)
         except StopIteration:

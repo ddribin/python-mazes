@@ -1,9 +1,9 @@
 import logging
-import math
 from dataclasses import dataclass
 
 import pygame as pg
 
+from . import utils
 from .game_maze import GameMaze
 
 
@@ -173,16 +173,17 @@ class GameLoop:
             if event.type == pg.JOYDEVICEADDED:
                 joy = pg.joystick.Joystick(event.device_index)
                 self._joysticks[joy.get_instance_id()] = joy
-                print(f"Joystick {joy.get_instance_id()} connected")
+                self.logger.info("Joystick %d connected", joy.get_instance_id())
 
             if event.type == pg.JOYDEVICEREMOVED:
                 if event.instance_id in self._joysticks:
                     del self._joysticks[event.instance_id]
-                    print(f"Joystick {event.instance_id} disconnected")
+                    self.logger.info("Joystick %d disconnected", event.instance_id)
                 else:
-                    print(
-                        f"Tried to disconnect Joystick {event.instance_id}, "
-                        "but couldn't find it in the joystick list"
+                    self.logger.error(
+                        "Tried to disconnect Joystick %d, "
+                        "but couldn't find it in the joystick list",
+                        event.instance_id,
                     )
 
         self._maze.update()
@@ -201,21 +202,23 @@ class GameLoop:
             self._maze.reset()
 
         if keys[pg.K_l] or keys[pg.K_SPACE] or joystick_state.dpad_right:
-            self._maze.generation_speed = 1
+            self._maze.generation_velocity = 100
         elif keys[pg.K_j] or joystick_state.dpad_left:
-            self._maze.generation_speed = -1
+            self._maze.generation_velocity = -100
         else:
-            dir = math.copysign(1.0, joystick_state.lstick_horizontal)
+            dir = utils.fsign(joystick_state.lstick_horizontal)
             speed = abs(joystick_state.lstick_horizontal)
-            scaled = 0.0
-            if speed >= 0.10 and speed < 0.60:
-                scaled = 1.0
-            elif speed >= 0.60 and speed < 0.80:
-                scaled = 2.0
-            elif speed >= 0.80:
-                scaled = 3.0
+            scaled = 0
+            if speed >= 0.20 and speed < 0.40:
+                scaled = 5
+            elif speed >= 0.4 and speed < 0.60:
+                scaled = 10
+            elif speed >= 0.60 and speed < 0.90:
+                scaled = 100
+            elif speed >= 0.90:
+                scaled = 300
             analog_speed = dir * scaled
-            self._maze.generation_speed = round(analog_speed)
+            self._maze.generation_velocity = analog_speed
 
         if self._jump_key:
             self._maze.run_to_completion()
