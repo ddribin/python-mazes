@@ -68,7 +68,7 @@ class MazeGenerator:
             case AlgorithmType.BinaryTree:
                 return BinaryTree(grid)
             case AlgorithmType.Sidewinder:
-                return Sidewinder(grid)
+                return Sidewinder(grid, state=self._maze_state)
             case AlgorithmType.RecursiveBacktracker:
                 return RecursiveBacktracker(grid, state=self._maze_state)
             case unknown:

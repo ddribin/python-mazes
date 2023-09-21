@@ -1,6 +1,9 @@
+from collections.abc import Sequence
+
 from mazes.algorithms import Sidewinder, SidewinderRandom
 from mazes.algorithms.utils import flatten
 from mazes.grid import Coordinate, Grid
+from mazes.maze_state import MutableMazeState
 from mazes.renderers import TextRenderer
 
 from ..asserts import assert_render
@@ -16,7 +19,7 @@ class FakeSidewindoerRandom(SidewinderRandom):
         self._should_close_out_index += 1
         return should_close_out
 
-    def choose_north(self, coords: list[Coordinate]) -> Coordinate:
+    def choose_north(self, coords: Sequence[Coordinate]) -> Coordinate:
         # Always choose the last item
         return coords[-1]
 
@@ -25,11 +28,38 @@ class TestSidewinder:
     def test_sidewinder(self):
         grid = Grid(3, 3)
         should_close_out = [
-            [True, False, False],  # y == 1
-            [False, False, False],  # y == 2
+            [False, False],  # y == 2
+            [True, False],  # y == 1
         ]
 
         text = self.render_grid(grid, should_close_out)
+
+        # Random seed of 5402118375022309858!!
+        expected = """
+            +---+---+---+
+            |           |
+            +   +---+   +
+            |   |       |
+            +---+---+   +
+            |           |
+            +---+---+---+
+            """
+        assert_render(text, expected)
+
+    def test_sidewinder_operations(self):
+        grid = Grid(3, 3)
+        state = MutableMazeState(grid, (0, 1))
+        should_close_out = [
+            [False, False],  # y == 2
+            [True, False],  # y == 1
+        ]
+
+        random = FakeSidewindoerRandom(flatten(should_close_out))
+        sidewinder = Sidewinder(grid, random, state)
+        for op in sidewinder.operations():
+            state.apply_operation(op)
+
+        text = TextRenderer.render_grid(grid)
 
         # Random seed of 5402118375022309858!!
         expected = """
