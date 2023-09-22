@@ -108,6 +108,8 @@ class MazeState:
     def target_directions(self) -> Direction:
         return self._target_directions
 
+
+class MutableMazeState(MazeState):
     def pop_maze_step(self) -> MazeStep:
         forward_ops = self._forward_operations
         backward_ops = self._backward_operations
@@ -119,7 +121,6 @@ class MazeState:
         step = MazeStep(forward_ops, backward_ops)
         return step
 
-    # Mutations
     def push_run(self, coordinate: Coordinate) -> None:
         op = MazeOpPushRun(coordinate)
         self._execute_operation(op)
@@ -144,7 +145,7 @@ class MazeState:
         op = MazeOpSetTargetCoords(coordinates)
         self._execute_operation(op)
 
-    def _apply_operation(self, operation: MazeOperation) -> MazeOperation:
+    def apply_operation(self, operation: MazeOperation) -> MazeOperation:
         match operation:
             case MazeOpPushRun(val):
                 self._run.append(val)
@@ -182,12 +183,7 @@ class MazeState:
                 assert_never(operation)
 
     def _execute_operation(self, op: MazeOperation) -> None:
-        backward_op = self._apply_operation(op)
+        backward_op = self.apply_operation(op)
         if self._records_operations:
             self._forward_operations.append(op)
             self._backward_operations.append(backward_op)
-
-
-class MutableMazeState(MazeState):
-    def apply_operation(self, operation: MazeOperation) -> MazeOperation:
-        return self._apply_operation(operation)

@@ -2,7 +2,7 @@ import logging
 import random
 from collections.abc import Iterator
 
-from ..core.maze_state import MazeState, MazeStep
+from ..core.maze_state import MazeStep, MutableMazeState
 from ..direction import Direction
 from ..grid import Coordinate, ImmutableGrid
 from .algorithm import Algorithm
@@ -21,7 +21,7 @@ class RecursiveBacktrackerRandom:
 class RecursiveBacktracker(Algorithm):
     def __init__(
         self,
-        state: MazeState,
+        state: MutableMazeState,
         random=RecursiveBacktrackerRandom(),
     ) -> None:
         self._state = state
