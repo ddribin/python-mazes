@@ -1,7 +1,5 @@
 from collections.abc import Sequence
 
-import pytest
-
 from mazes.algorithms import Sidewinder, SidewinderRandom
 from mazes.algorithms.utils import flatten
 from mazes.core.maze_state import MutableMazeState
@@ -11,7 +9,7 @@ from mazes.renderers import TextRenderer
 from ..asserts import assert_render
 
 
-class FakeSidewindoerRandom(SidewinderRandom):
+class FakeSidewinderRandom(SidewinderRandom):
     def __init__(self, should_close_out: list[bool]) -> None:
         self._should_close_out = should_close_out
         self._should_close_out_index = 0
@@ -27,28 +25,6 @@ class FakeSidewindoerRandom(SidewinderRandom):
 
 
 class TestSidewinder:
-    @pytest.mark.skip()
-    def test_sidewinder(self):
-        grid = Grid(3, 3)
-        should_close_out = [
-            [False, False],  # y == 2
-            [True, False],  # y == 1
-        ]
-
-        text = self.render_grid(grid, should_close_out)
-
-        # Random seed of 5402118375022309858!!
-        expected = """
-            +---+---+---+
-            |           |
-            +   +---+   +
-            |   |       |
-            +---+---+   +
-            |           |
-            +---+---+---+
-            """
-        assert_render(text, expected)
-
     def test_sidewinder_operations(self):
         grid = Grid(3, 3)
         state = MutableMazeState(grid, (0, 1))
@@ -57,10 +33,10 @@ class TestSidewinder:
             [True, False],  # y == 1
         ]
 
-        random = FakeSidewindoerRandom(flatten(should_close_out))
-        sidewinder = Sidewinder(grid, random, state)
-        for op in sidewinder.operations():
-            state.apply_operation(op)
+        random = FakeSidewinderRandom(flatten(should_close_out))
+        sidewinder = Sidewinder(state, random)
+        for _ in sidewinder.maze_steps():
+            pass
 
         text = TextRenderer.render_grid(grid)
 
@@ -75,10 +51,3 @@ class TestSidewinder:
             +---+---+---+
             """
         assert_render(text, expected)
-
-    def render_grid(self, grid: Grid, should_close_out: list[list[bool]]) -> str:
-        random = FakeSidewindoerRandom(flatten(should_close_out))
-        sidewinder = Sidewinder(grid, random)
-        sidewinder.generate()
-        text = TextRenderer.render_grid(grid)
-        return text

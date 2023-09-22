@@ -52,7 +52,7 @@ class Maze:
             case Maze.AlgorithmType.BinaryTree:
                 return BinaryTree(grid)
             case Maze.AlgorithmType.Sidewinder:
-                return Sidewinder(grid)
+                return Sidewinder(state)
             case Maze.AlgorithmType.RecursiveBacktracker:
                 return RecursiveBacktracker(state)
             case unknown:
