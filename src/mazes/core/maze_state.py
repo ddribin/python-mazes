@@ -43,11 +43,6 @@ class MazeOpSetTargetDirs:
     directions: Direction
 
 
-@dataclass(frozen=True, slots=True)
-class MazeOpStep:
-    pass
-
-
 MazeOperation = (
     MazeOpPushRun
     | MazeOpPopRun
@@ -56,7 +51,6 @@ MazeOperation = (
     | MazeOpSetRun
     | MazeOpSetTargetCoords
     | MazeOpSetTargetDirs
-    | MazeOpStep
 )
 
 
@@ -183,9 +177,6 @@ class MazeState:
                 prev_dirs = self._target_directions
                 self._target_directions = dirs
                 return MazeOpSetTargetDirs(prev_dirs)
-
-            case MazeOpStep():
-                return operation
 
             case _:
                 assert_never(operation)

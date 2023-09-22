@@ -1,7 +1,6 @@
 from .core.maze_state import (
     MazeOperation,
     MazeOperations,
-    MazeOpStep,
     MazeState,
     MazeStep,
     MutableMazeState,
