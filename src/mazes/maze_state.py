@@ -62,6 +62,12 @@ MazeOperation = (
 MazeOperations = list[MazeOperation]
 
 
+@dataclass(frozen=True, slots=True)
+class MazeStep:
+    forward_operations: list[MazeOperation] = field(default_factory=list)
+    backward_operations: list[MazeOperation] = field(default_factory=list)
+
+
 class MazeState:
     def __init__(self, grid: Grid, start: Coordinate) -> None:
         width = grid.width
@@ -74,6 +80,10 @@ class MazeState:
         self._run: list[Coordinate] = []
         self._target_coordinates: list[Coordinate] = []
         self._target_directions = Direction.Empty
+
+        self._forward_operations: list[MazeOperation] = []
+        self._backward_operations: list[MazeOperation] = []
+        self._records_operations = True
 
     @property
     def grid(self) -> ImmutableGrid:
@@ -103,9 +113,43 @@ class MazeState:
     def target_directions(self) -> Direction:
         return self._target_directions
 
+    def pop_maze_step(self) -> MazeStep:
+        forward_ops = self._forward_operations
+        backward_ops = self._backward_operations
+        backward_ops.reverse()
 
-class MutableMazeState(MazeState):
-    def apply_operation(self, operation: MazeOperation) -> MazeOperation:
+        self._forward_operations = []
+        self._backward_operations = []
+
+        step = MazeStep(forward_ops, backward_ops)
+        return step
+
+    # Mutations
+    def push_run(self, coordinate: Coordinate) -> None:
+        op = MazeOpPushRun(coordinate)
+        self._execute_operation(op)
+
+    def pop_run(self) -> None:
+        op = MazeOpPopRun()
+        self._execute_operation(op)
+
+    def set_run(self, run: list[Coordinate]) -> None:
+        op = MazeOpSetRun(run)
+        self._execute_operation(op)
+
+    def grid_link(self, coordinate: Coordinate, direction: Direction) -> None:
+        op = MazeOpGridLink(coordinate, direction)
+        self._execute_operation(op)
+
+    def grid_unlink(self, coordinate: Coordinate, direction: Direction) -> None:
+        op = MazeOpGridUnlink(coordinate, direction)
+        self._execute_operation(op)
+
+    def set_target_coordinates(self, coordinates: list[Coordinate]) -> None:
+        op = MazeOpSetTargetCoords(coordinates)
+        self._execute_operation(op)
+
+    def _apply_operation(self, operation: MazeOperation) -> MazeOperation:
         match operation:
             case MazeOpPushRun(val):
                 self._run.append(val)
@@ -144,3 +188,14 @@ class MutableMazeState(MazeState):
 
             case _:
                 assert_never(operation)
+
+    def _execute_operation(self, op: MazeOperation) -> None:
+        backward_op = self._apply_operation(op)
+        if self._records_operations:
+            self._forward_operations.append(op)
+            self._backward_operations.append(backward_op)
+
+
+class MutableMazeState(MazeState):
+    def apply_operation(self, operation: MazeOperation) -> MazeOperation:
+        return self._apply_operation(operation)

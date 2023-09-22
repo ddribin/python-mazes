@@ -13,6 +13,7 @@ from ..maze_state import (
     MazeOpSetTargetCoords,
     MazeOpStep,
     MazeState,
+    MazeStep,
 )
 from .algorithm import Algorithm
 
@@ -136,6 +137,36 @@ class RecursiveBacktracker(Algorithm):
                 yield MazeOpPushRun(next_coord)
 
         yield MazeOpStep()
+
+    def maze_steps(self) -> Iterator[MazeStep]:
+        state = self._state
+        assert state is not None
+        grid = state.grid
+        stack = state.run
+        random = self._random
+
+        start_at = random.random_coordinate(grid)
+        state.push_run(start_at)
+
+        while stack:
+            current = stack[-1]
+            available_directions = grid.available_directions(current)
+
+            if not available_directions:
+                state.set_target_coordinates([])
+                yield state.pop_maze_step()
+                state.pop_run()
+            else:
+                targets = self.targets_from_directions(current, available_directions)
+                state.set_target_coordinates(targets)
+                yield state.pop_maze_step()
+
+                next_direction = random.choose_direction(available_directions)
+                next_coord = next_direction.update_coordinate(current)
+                state.grid_link(current, next_direction)
+                state.push_run(next_coord)
+
+        yield state.pop_maze_step()
 
     def targets_from_directions(
         self, coord: Coordinate, directions: Direction
