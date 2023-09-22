@@ -3,7 +3,6 @@ from collections.abc import Iterator
 from typing_extensions import Protocol
 
 from ..core.maze_state import MazeStep
-from ..grid import Coordinate
 
 
 def next_step(step_iterator: Iterator[None]) -> bool:
@@ -28,15 +27,3 @@ class Algorithm(Protocol):
         """
         for _ in self.maze_steps():
             pass
-
-    @property
-    def current(self) -> set[Coordinate]:
-        ...
-
-    @property
-    def trail(self) -> set[Coordinate]:
-        ...
-
-    @property
-    def targets(self) -> set[Coordinate]:
-        ...

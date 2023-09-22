@@ -23,21 +23,6 @@ class Sidewinder(Algorithm):
     ) -> None:
         self._state = state
         self._random = random
-        self._current: set[Coordinate] = set()
-        self._trail: set[Coordinate] = set()
-        self._targets: set[Coordinate] = set()
-
-    @property
-    def current(self) -> set[Coordinate]:
-        return self._current
-
-    @property
-    def trail(self) -> set[Coordinate]:
-        return self._trail
-
-    @property
-    def targets(self) -> set[Coordinate]:
-        return self._targets
 
     def maze_steps(self) -> Iterator[MazeStep]:
         state = self._state
@@ -76,7 +61,4 @@ class Sidewinder(Algorithm):
 
                     state.grid_link(coord, Direction.E)
 
-        self._current = set()
-        self._trail = set()
-        self._targets = set()
         yield state.pop_maze_step()

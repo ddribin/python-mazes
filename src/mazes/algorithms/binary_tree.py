@@ -3,7 +3,6 @@ from collections.abc import Iterator
 
 from ..core.maze_state import MazeStep, MutableMazeState
 from ..direction import Direction
-from ..grid import Coordinate
 from .algorithm import Algorithm
 
 
@@ -16,18 +15,6 @@ class BinaryTree(Algorithm):
     def __init__(self, state: MutableMazeState, random=BinaryTreeRandom()) -> None:
         self._state = state
         self._random = random
-
-    @property
-    def current(self) -> set[Coordinate]:
-        return set()
-
-    @property
-    def trail(self) -> set[Coordinate]:
-        return set()
-
-    @property
-    def targets(self) -> set[Coordinate]:
-        return set()
 
     def maze_steps(self) -> Iterator[MazeStep]:
         state = self._state

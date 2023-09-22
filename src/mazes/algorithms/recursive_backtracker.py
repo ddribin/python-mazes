@@ -24,27 +24,9 @@ class RecursiveBacktracker(Algorithm):
         state: MazeState,
         random=RecursiveBacktrackerRandom(),
     ) -> None:
-        self._random = random
-        self._current: set[Coordinate] = set()
-        self._trail: set[Coordinate] = set()
-        self._targets: set[Coordinate] = set()
         self._state = state
+        self._random = random
         self._logger = logging.getLogger(__name__)
-
-    @property
-    def current(self) -> set[Coordinate]:
-        return self._current
-
-    @property
-    def trail(self) -> set[Coordinate]:
-        return self._trail
-
-    @property
-    def targets(self) -> set[Coordinate]:
-        return self._targets
-
-    def steps(self) -> Iterator[None]:
-        raise NotImplementedError()
 
     def maze_steps(self) -> Iterator[MazeStep]:
         state = self._state
