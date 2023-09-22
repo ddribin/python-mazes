@@ -14,7 +14,7 @@ class TestMazeStepper:
             state.push_run((0, 1))
             yield state.pop_maze_step()
 
-        _ = MazeStepper(state, iter([]), steps())
+        _ = MazeStepper(state, steps())
 
         assert grid.available_directions((0, 0)) == D.S | D.E
         assert state.run == []
@@ -28,7 +28,7 @@ class TestMazeStepper:
             state.push_run((0, 1))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward()
 
@@ -44,7 +44,7 @@ class TestMazeStepper:
             state.push_run((0, 1))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward()
         stepper.step_backward()
@@ -61,7 +61,7 @@ class TestMazeStepper:
             state.push_run((0, 1))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward()
         stepper.step_backward()
@@ -83,7 +83,7 @@ class TestMazeStepper:
             state.push_run((0, 2))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward()
         assert grid.available_directions((0, 0)) == D.S
@@ -107,7 +107,7 @@ class TestMazeStepper:
             state.push_run((0, 2))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward()
         stepper.step_forward()
@@ -139,7 +139,7 @@ class TestMazeStepper:
             state.push_run((1, 2))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward()
         stepper.step_forward()
@@ -168,7 +168,7 @@ class TestMazeStepper:
             state.push_run((1, 2))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward_until_end()
 
@@ -191,7 +191,7 @@ class TestMazeStepper:
             state.push_run((1, 2))
             yield state.pop_maze_step()
 
-        stepper = MazeStepper(state, iter([]), steps())
+        stepper = MazeStepper(state, steps())
 
         stepper.step_forward_until_end()
         stepper.step_backward_until_end()

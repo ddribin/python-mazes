@@ -58,7 +58,7 @@ class GameMaze:
     def reset(self) -> None:
         options = MazeOptions(self._grid_width, self._grid_height)
 
-        options.algorithmType = AlgorithmType.Sidewinder
+        options.algorithmType = AlgorithmType.RecursiveBacktracker
         options.start = options.northwest_corner
         options.end = options.southeast_corner
 

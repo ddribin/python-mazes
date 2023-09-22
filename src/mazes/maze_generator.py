@@ -105,7 +105,7 @@ class MazeGenerator:
         return self._maze_state
 
     def make_stepper(self) -> MazeStepper:
-        return MazeStepper(self._maze_state, self._algorithm.operations())
+        return MazeStepper(self._maze_state, self._algorithm.maze_steps())
 
     def apply_operation(self, operation: MazeOperation) -> None:
         self._maze_state.apply_operation(operation)
