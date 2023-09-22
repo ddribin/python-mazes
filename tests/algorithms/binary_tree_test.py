@@ -1,6 +1,6 @@
-import pytest
-
+from mazes import MutableMazeState
 from mazes.algorithms import BinaryTree, BinaryTreeRandom
+from mazes.algorithms.utils import flatten
 from mazes.grid import Direction as D
 from mazes.grid import Grid
 from mazes.renderers.text_renderer import TextRenderer
@@ -20,21 +20,16 @@ class FakeBinaryTreeRandom(BinaryTreeRandom):
 
 
 class TestBinaryTree:
-    @pytest.mark.skip()
     def test_binary_tree(self):
         grid = Grid(3, 3)
+        state = MutableMazeState(grid, (0, 0))
 
         directions = [
-            D.E,
-            D.E,
-            D.N,
-            D.E,
-            D.N,
-            D.E,
-            D.N,
-            D.N,
+            [D.E, D.N, D.N],  # y = 2
+            [D.N, D.E, D.N],  # y = 1
+            [D.E, D.E],  # y = 0
         ]
-        text = self.render_grid(grid, directions)
+        text = self.render_grid(state, flatten(directions))
 
         expected = """
             +---+---+---+
@@ -47,9 +42,9 @@ class TestBinaryTree:
             """
         assert_render(text, expected)
 
-    def render_grid(self, grid: Grid, fake_directions: list[D]) -> str:
+    def render_grid(self, state: MutableMazeState, fake_directions: list[D]) -> str:
         random = FakeBinaryTreeRandom(fake_directions)
-        binary_tree = BinaryTree(grid, random)
+        binary_tree = BinaryTree(state, random)
         binary_tree.generate()
-        text = TextRenderer.render_grid(grid)
+        text = TextRenderer.render_grid(state.grid)
         return text

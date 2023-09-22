@@ -35,8 +35,7 @@ class TestRecursiveBacktracker:
         ]
 
         algo = self.make_algorithm(grid, (0, 1), flatten(directions), state)
-        for _ in algo.maze_steps():
-            pass
+        algo.generate()
 
         text = TextRenderer.render_grid(grid)
 

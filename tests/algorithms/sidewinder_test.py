@@ -35,8 +35,7 @@ class TestSidewinder:
 
         random = FakeSidewinderRandom(flatten(should_close_out))
         sidewinder = Sidewinder(state, random)
-        for _ in sidewinder.maze_steps():
-            pass
+        sidewinder.generate()
 
         text = TextRenderer.render_grid(grid)
 

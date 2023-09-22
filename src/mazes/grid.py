@@ -23,7 +23,14 @@ class ImmutableGrid(Protocol):
         ...
 
     def coordinates(self) -> Iterator[Coordinate]:
-        ...
+        for y in range(self.height):
+            for x in range(self.width):
+                yield (x, y)
+
+    def coordinates_bottom_first(self) -> Iterator[Coordinate]:
+        for y in reversed(range(self.height)):
+            for x in range(self.width):
+                yield (x, y)
 
     # Default implementations
 
@@ -114,11 +121,6 @@ class Grid(ImmutableGrid):
         for y in range(self._height):
             for x in range(self._width):
                 yield (x, y), self._grid[y][x]
-
-    def coordinates(self) -> Iterator[Coordinate]:
-        for y in range(self._height):
-            for x in range(self._width):
-                yield (x, y)
 
     # Mutable Methods
 

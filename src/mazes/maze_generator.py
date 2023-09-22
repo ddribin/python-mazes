@@ -62,14 +62,14 @@ class MazeGenerator:
     def _init_algorithm(self, mazeType: AlgorithmType) -> Algorithm:
         from .algorithms import BinaryTree, RecursiveBacktracker, Sidewinder
 
-        grid = self._grid
+        state = self._maze_state
         match mazeType:
             case AlgorithmType.BinaryTree:
-                return BinaryTree(grid)
+                return BinaryTree(state)
             case AlgorithmType.Sidewinder:
-                return Sidewinder(self._maze_state)
+                return Sidewinder(state)
             case AlgorithmType.RecursiveBacktracker:
-                return RecursiveBacktracker(self._maze_state)
+                return RecursiveBacktracker(state)
             case unknown:
                 raise ValueError(unknown)
 
