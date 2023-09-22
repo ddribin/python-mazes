@@ -2,9 +2,7 @@ import logging
 import random
 from collections.abc import Iterator
 
-from ..direction import Direction
-from ..grid import Coordinate, Grid, ImmutableGrid
-from ..maze_state import (
+from ..core.maze_state import (
     MazeOperation,
     MazeOperations,
     MazeOpGridLink,
@@ -15,6 +13,8 @@ from ..maze_state import (
     MazeState,
     MazeStep,
 )
+from ..direction import Direction
+from ..grid import Coordinate, Grid, ImmutableGrid
 from .algorithm import Algorithm
 
 

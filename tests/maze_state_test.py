@@ -2,7 +2,7 @@ import pytest
 
 from mazes import Direction as D
 from mazes import Grid
-from mazes.maze_state import (
+from mazes.core.maze_state import (
     MazeOperations,
     MazeOpGridLink,
     MazeOpGridUnlink,

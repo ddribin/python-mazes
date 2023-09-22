@@ -6,8 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from . import Coordinate, Grid, ImmutableGrid
-from .maze_state import MazeOperation, MazeState, MutableMazeState
-from .maze_stepper import MazeStepper
+from .core.maze_state import MazeOperation, MazeState, MutableMazeState
+from .core.maze_stepper import MazeStepper
 
 
 class AlgorithmType(Enum):

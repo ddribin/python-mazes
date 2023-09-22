@@ -1,6 +1,6 @@
 from mazes import Direction as D
 from mazes import Grid, MazeOperation, MazeStepper, MutableMazeState
-from mazes.maze_state import MazeOpGridLink, MazeOpPushRun, MazeOpStep
+from mazes.core.maze_state import MazeOpGridLink, MazeOpPushRun, MazeOpStep
 
 
 class TestMazeStepper:

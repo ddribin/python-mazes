@@ -1,8 +1,8 @@
 from mazes.algorithms import RecursiveBacktracker, RecursiveBacktrackerRandom
 from mazes.algorithms.utils import flatten
+from mazes.core.maze_state import MazeOperation, MazeOpStep, MutableMazeState
 from mazes.direction import Direction as D
 from mazes.grid import Coordinate, Grid, ImmutableGrid
-from mazes.maze_state import MazeOperation, MazeOpStep, MutableMazeState
 from mazes.renderers import TextRenderer
 
 from ..asserts import assert_render

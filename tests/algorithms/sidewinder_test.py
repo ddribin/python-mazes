@@ -2,8 +2,8 @@ from collections.abc import Sequence
 
 from mazes.algorithms import Sidewinder, SidewinderRandom
 from mazes.algorithms.utils import flatten
+from mazes.core.maze_state import MutableMazeState
 from mazes.grid import Coordinate, Grid
-from mazes.maze_state import MutableMazeState
 from mazes.renderers import TextRenderer
 
 from ..asserts import assert_render

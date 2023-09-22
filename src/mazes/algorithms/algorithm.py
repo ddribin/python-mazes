@@ -2,8 +2,8 @@ from collections.abc import Iterator
 
 from typing_extensions import Protocol
 
+from ..core.maze_state import MazeOperation, MazeOpStep, MazeStep
 from ..grid import Coordinate
-from ..maze_state import MazeOperation, MazeOpStep, MazeStep
 
 
 def next_step(step_iterator: Iterator[None]) -> bool:

@@ -1,9 +1,7 @@
 import random
 from collections.abc import Iterator, Sequence
 
-from ..direction import Direction
-from ..grid import Coordinate, Grid
-from ..maze_state import (
+from ..core.maze_state import (
     MazeOperation,
     MazeOpGridLink,
     MazeOpPushRun,
@@ -12,6 +10,8 @@ from ..maze_state import (
     MazeOpStep,
     MazeState,
 )
+from ..direction import Direction
+from ..grid import Coordinate, Grid
 from .algorithm import Algorithm
 
 
