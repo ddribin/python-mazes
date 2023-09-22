@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from mazes.algorithms import RecursiveBacktracker, RecursiveBacktrackerRandom
 from mazes.algorithms.utils import flatten
 from mazes.core.maze_state import MazeOperation, MazeOpStep, MazeStep, MutableMazeState
@@ -97,7 +99,7 @@ class TestRecursiveBacktracker:
         saved_ops: list[MazeStep] = []
         for step in algo.maze_steps():
             saved_ops.append(step)
-            print(f"{step}")
+            pprint(step)
             print("---")
 
         text = TextRenderer.render_grid(grid)
