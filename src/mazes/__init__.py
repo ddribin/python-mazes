@@ -3,6 +3,7 @@ from .core.maze_state import (
     MazeOperations,
     MazeOpStep,
     MazeState,
+    MazeStep,
     MutableMazeState,
 )
 from .core.maze_stepper import MazeStepper

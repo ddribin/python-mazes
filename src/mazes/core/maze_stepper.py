@@ -1,24 +1,21 @@
 from collections import deque
 from collections.abc import Iterator
-from dataclasses import dataclass, field
 
-from .maze_state import MazeOperation, MazeOpStep, MutableMazeState
-
-
-@dataclass(frozen=True, slots=True)
-class MazeStep:
-    forward_operations: list[MazeOperation] = field(default_factory=list)
-    backward_operations: list[MazeOperation] = field(default_factory=list)
+from .maze_state import MazeOperation, MazeOpStep, MazeStep, MutableMazeState
 
 
 class MazeStepper:
     def __init__(
-        self, state: MutableMazeState, generator: Iterator[MazeOperation]
+        self,
+        state: MutableMazeState,
+        generator: Iterator[MazeOperation],
+        step_generator: Iterator[MazeStep] | None = None,
     ) -> None:
         self._state = state
         self._backward_steps: deque[MazeStep] = deque()
         self._forward_steps: deque[MazeStep] = deque()
         self._generator = generator
+        self._step_generator = step_generator
         self._generator_done = False
 
     def step_forward_until_end(self) -> None:
@@ -50,6 +47,21 @@ class MazeStepper:
         return True
 
     def _step_forward_from_generator(self) -> bool:
+        if self._step_generator is None:
+            return self._step_forward_from_operation_generator()
+        else:
+            return self._step_forward_from_step_generator()
+
+    def _step_forward_from_step_generator(self) -> bool:
+        assert self._step_generator is not None
+        try:
+            step = next(self._step_generator)
+            self._backward_steps.append(step)
+            return True
+        except StopIteration:
+            return False
+
+    def _step_forward_from_operation_generator(self) -> bool:
         step = self._next_generator_step()
         if step is not None:
             self._backward_steps.append(step)

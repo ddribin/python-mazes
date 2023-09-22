@@ -2,7 +2,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import assert_never
 
-from .. import Coordinate, Direction, Distances, Grid, ImmutableDistances, ImmutableGrid
+from ..distances import Distances, ImmutableDistances
+from ..grid import Coordinate, Direction, Grid, ImmutableGrid
 
 
 @dataclass(frozen=True, slots=True)
