@@ -1,6 +1,7 @@
 import random
 from collections.abc import Iterator
 
+from ..core.maze_state import MazeStep
 from ..direction import Direction
 from ..grid import Coordinate, Grid
 from .algorithm import Algorithm
@@ -29,6 +30,9 @@ class BinaryTree(Algorithm):
     @property
     def targets(self) -> set[Coordinate]:
         return self._targets
+
+    def maze_steps(self) -> Iterator[MazeStep]:
+        raise NotImplementedError()
 
     def steps(self) -> Iterator[None]:
         grid = self._grid

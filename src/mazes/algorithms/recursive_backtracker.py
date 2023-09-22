@@ -2,19 +2,9 @@ import logging
 import random
 from collections.abc import Iterator
 
-from ..core.maze_state import (
-    MazeOperation,
-    MazeOperations,
-    MazeOpGridLink,
-    MazeOpPopRun,
-    MazeOpPushRun,
-    MazeOpSetTargetCoords,
-    MazeOpStep,
-    MazeState,
-    MazeStep,
-)
+from ..core.maze_state import MazeState, MazeStep
 from ..direction import Direction
-from ..grid import Coordinate, Grid, ImmutableGrid
+from ..grid import Coordinate, ImmutableGrid
 from .algorithm import Algorithm
 
 
@@ -31,11 +21,9 @@ class RecursiveBacktrackerRandom:
 class RecursiveBacktracker(Algorithm):
     def __init__(
         self,
-        grid: Grid,
+        state: MazeState,
         random=RecursiveBacktrackerRandom(),
-        state: MazeState | None = None,
     ) -> None:
-        self._grid = grid
         self._random = random
         self._current: set[Coordinate] = set()
         self._trail: set[Coordinate] = set()
@@ -56,87 +44,7 @@ class RecursiveBacktracker(Algorithm):
         return self._targets
 
     def steps(self) -> Iterator[None]:
-        grid = self._grid
-        random = self._random
-
-        start_at = random.random_coordinate(grid)
-        stack = [start_at]
-        self._current = {stack[-1]}
-        self._trail = set(stack)
-
-        while stack:
-            current = stack[-1]
-            available_directions = grid.available_directions(current)
-
-            self._current = {current}
-            self._trail = set(stack)
-
-            if not available_directions:
-                self._targets = set()
-                yield
-                stack.pop()
-            else:
-                self._targets = {
-                    dir.update_coordinate(current) for dir in available_directions
-                }
-                yield
-                next_direction = random.choose_direction(available_directions)
-                grid.link(current, next_direction)
-                next_coord = next_direction.update_coordinate(current)
-                stack.append(next_coord)
-
-        self._current = set()
-        self._trail = set()
-        self._targets = set()
-        yield
-
-    def send_op(self, op: MazeOperation) -> Iterator[MazeOperation]:
-        yield op
-
-    def operation_steps(
-        self, operations: Iterator[MazeOperation]
-    ) -> Iterator[MazeOperations]:
-        step: MazeOperations = []
-        for op in operations:
-            match op:
-                case MazeOpStep():
-                    print(f"{step=}")
-                    yield step
-                    step = []
-
-                case _:
-                    print(f"{op=}")
-                    step.append(op)
-
-    def operations(self) -> Iterator[MazeOperation]:
-        state = self._state
-        assert state is not None
-        grid = state.grid
-        stack = state.run
-        random = self._random
-
-        start_at = random.random_coordinate(grid)
-        yield MazeOpPushRun(start_at)
-
-        while stack:
-            current = stack[-1]
-            available_directions = grid.available_directions(current)
-
-            if not available_directions:
-                yield MazeOpSetTargetCoords([])
-                yield MazeOpStep()
-                yield MazeOpPopRun()
-            else:
-                targets = self.targets_from_directions(current, available_directions)
-                yield MazeOpSetTargetCoords(targets)
-                yield MazeOpStep()
-
-                next_direction = random.choose_direction(available_directions)
-                next_coord = next_direction.update_coordinate(current)
-                yield MazeOpGridLink(current, next_direction)
-                yield MazeOpPushRun(next_coord)
-
-        yield MazeOpStep()
+        raise NotImplementedError()
 
     def maze_steps(self) -> Iterator[MazeStep]:
         state = self._state

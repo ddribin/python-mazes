@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import random
-from collections.abc import Iterator
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
@@ -70,7 +69,7 @@ class MazeGenerator:
             case AlgorithmType.Sidewinder:
                 return Sidewinder(grid, state=self._maze_state)
             case AlgorithmType.RecursiveBacktracker:
-                return RecursiveBacktracker(grid, state=self._maze_state)
+                return RecursiveBacktracker(self._maze_state)
             case unknown:
                 raise ValueError(unknown)
 
@@ -109,12 +108,3 @@ class MazeGenerator:
 
     def apply_operation(self, operation: MazeOperation) -> None:
         self._maze_state.apply_operation(operation)
-
-    def __iter__(self) -> Iterator[None]:
-        return self._algorithm.steps()
-
-    def steps(self) -> Iterator[None]:
-        return self._algorithm.steps()
-
-    def operations(self) -> Iterator[MazeOperation]:
-        return self._algorithm.operations()

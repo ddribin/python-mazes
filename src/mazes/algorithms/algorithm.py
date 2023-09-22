@@ -2,7 +2,7 @@ from collections.abc import Iterator
 
 from typing_extensions import Protocol
 
-from ..core.maze_state import MazeOperation, MazeOpStep, MazeStep
+from ..core.maze_state import MazeStep
 from ..grid import Coordinate
 
 
@@ -16,7 +16,7 @@ def next_step(step_iterator: Iterator[None]) -> bool:
 
 
 class Algorithm(Protocol):
-    def steps(self) -> Iterator[None]:
+    def maze_steps(self) -> Iterator[MazeStep]:
         """
         Generates a maze. This is a generator method that yields at each step.
         """
@@ -26,14 +26,8 @@ class Algorithm(Protocol):
         """
         Generates all steps.
         """
-        for _ in self.steps():
+        for _ in self.maze_steps():
             pass
-
-    def operations(self) -> Iterator[MazeOperation]:
-        yield MazeOpStep()
-
-    def maze_steps(self) -> Iterator[MazeStep]:
-        yield MazeStep([], [])
 
     @property
     def current(self) -> set[Coordinate]:

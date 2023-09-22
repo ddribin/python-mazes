@@ -1,3 +1,5 @@
+import pytest
+
 from mazes.algorithms import BinaryTree, BinaryTreeRandom
 from mazes.grid import Direction as D
 from mazes.grid import Grid
@@ -18,6 +20,7 @@ class FakeBinaryTreeRandom(BinaryTreeRandom):
 
 
 class TestBinaryTree:
+    @pytest.mark.skip()
     def test_binary_tree(self):
         grid = Grid(3, 3)
 

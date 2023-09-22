@@ -9,6 +9,7 @@ from .algorithms import (
     RecursiveBacktracker,
     Sidewinder,
 )
+from .core.maze_state import MutableMazeState
 from .distances import Distances
 from .grid import Grid, ImmutableGrid
 from .renderers import Color, ImageRenderer, TextRenderer
@@ -36,21 +37,24 @@ class Maze:
         overlayType=OverlayType.Nothing,
     ) -> Maze:
         grid = Grid(width, height)
+        state = MutableMazeState(grid, (0, 0))
 
-        algorithm = Maze.make_algorithm(algorithmType, grid)
+        algorithm = Maze.make_algorithm(algorithmType, grid, state)
         algorithm.generate()
 
         return Maze(grid, overlayType)
 
     @classmethod
-    def make_algorithm(cls, mazeType: Maze.AlgorithmType, grid: Grid) -> Algorithm:
+    def make_algorithm(
+        cls, mazeType: Maze.AlgorithmType, grid: Grid, state: MutableMazeState
+    ) -> Algorithm:
         match mazeType:
             case Maze.AlgorithmType.BinaryTree:
                 return BinaryTree(grid)
             case Maze.AlgorithmType.Sidewinder:
                 return Sidewinder(grid)
             case Maze.AlgorithmType.RecursiveBacktracker:
-                return RecursiveBacktracker(grid)
+                return RecursiveBacktracker(state)
             case unknown:
                 raise ValueError(unknown)
 

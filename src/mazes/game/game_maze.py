@@ -73,7 +73,6 @@ class GameMaze:
         logging.info("options: %s", options)
         self._maze = MazeGenerator(options)
         print(f"Seed: {self._maze.seed}")
-        self._maze_steps = self._maze.steps()
         self._maze_stepper = self._maze.make_stepper()
         self._state = self.State.Generating
         self._generation_speed = 0
