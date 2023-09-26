@@ -296,6 +296,14 @@ class TestMazeState:
             MazeOpSetTargetCoords([]),
         ]
 
+    def test_dijkstra_distances_initial_state(self) -> None:
+        state = self.make_state()
+
+        state.reset_dijstra_distances((0, 0))
+
+        assert state.dijkstra_distances[(0, 0)] == 0
+        assert state.dijkstra_distances[(0, 1)] is None
+
     def make_state(self) -> MutableMazeState:
         grid = Grid(5, 5)
         state = MutableMazeState(grid, (0, 0))

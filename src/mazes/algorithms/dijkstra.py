@@ -2,14 +2,21 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
+from ..core.maze_state import MazeStep, MutableMazeState
 from ..distances import Distances
 from ..grid import Coordinate, ImmutableGrid
 from .utils import unwrap
 
 
 class Dijkstra:
-    def __init__(self, grid: ImmutableGrid, root: Coordinate) -> None:
+    def __init__(
+        self,
+        grid: ImmutableGrid,
+        root: Coordinate,
+        state: MutableMazeState | None = None,
+    ) -> None:
         self._grid = grid
+        self._state = state
         self._distances = Distances(grid.width, grid.height, root)
 
     @property
@@ -52,6 +59,9 @@ class Dijkstra:
 
         self._max_distance = max_distance
         self._max_coordinate = max_coord
+
+    def maze_steps(self) -> Iterator[MazeStep]:
+        ...
 
     def generate(self) -> None:
         for _ in self.steps():
