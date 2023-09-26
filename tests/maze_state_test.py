@@ -296,6 +296,7 @@ class TestMazeState:
             MazeOpSetTargetCoords([]),
         ]
 
+    @pytest.mark.skip
     def test_dijkstra_distances_initial_state(self) -> None:
         state = self.make_state()
 

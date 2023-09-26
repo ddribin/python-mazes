@@ -182,6 +182,13 @@ class MutableMazeState(MazeState):
             case _:
                 assert_never(operation)
 
+    def reset_dijstra_distances(self, start: Coordinate) -> None:
+        ...
+
+    @property
+    def dijkstra_distances(self) -> Distances:
+        ...
+
     def _execute_operation(self, op: MazeOperation) -> None:
         backward_op = self.apply_operation(op)
         if self._records_operations:
