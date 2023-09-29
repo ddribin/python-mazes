@@ -31,3 +31,12 @@ class TestDistances:
                     assert distances[x, y] == 2
                 else:
                     assert distances[x, y] is None
+
+    def test_clear_coordinate(self) -> None:
+        distances = Distances(3, 3, (0, 0))
+        distances[0, 1] = 1
+        distances[1, 1] = 2
+        distances.clear_at((0, 1))
+
+        assert distances[(0, 1)] is None
+        assert distances[(1, 1)] == 2

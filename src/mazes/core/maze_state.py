@@ -43,6 +43,12 @@ class MazeOpSetTargetDirs:
     directions: Direction
 
 
+@dataclass(frozen=True, slots=True)
+class MazeOpSetDistance:
+    coord: Coordinate
+    distance: int | None
+
+
 MazeOperation = (
     MazeOpPushRun
     | MazeOpPopRun
@@ -51,6 +57,7 @@ MazeOperation = (
     | MazeOpSetRun
     | MazeOpSetTargetCoords
     | MazeOpSetTargetDirs
+    | MazeOpSetDistance
 )
 
 
@@ -178,6 +185,14 @@ class MutableMazeState(MazeState):
                 prev_dirs = self._target_directions
                 self._target_directions = dirs
                 return MazeOpSetTargetDirs(prev_dirs)
+
+            case MazeOpSetDistance(coord, val):
+                prev_distance = self._distances[coord]
+                if val is not None:
+                    self._distances[coord] = val
+                else:
+                    self._distances.clear_at(coord)
+                return MazeOpSetDistance(coord, prev_distance)
 
             case _:
                 assert_never(operation)

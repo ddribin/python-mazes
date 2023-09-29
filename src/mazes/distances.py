@@ -98,6 +98,12 @@ class Distances(ImmutableDistances):
             self._max_distance = distance
             self._max_coordinate = coordinate
 
+    def clear_at(self, coordinate: Coordinate) -> None:
+        self.assert_valid_coordinate(coordinate)
+
+        x, y = coordinate
+        self._grid[y][x] = None
+
     def coordinates(self) -> Iterator[Coordinate]:
         for y in range(self._height):
             for x in range(self._width):

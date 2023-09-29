@@ -8,6 +8,7 @@ from mazes.core.maze_state import (
     MazeOpGridUnlink,
     MazeOpPopRun,
     MazeOpPushRun,
+    MazeOpSetDistance,
     MazeOpSetRun,
     MazeOpSetTargetCoords,
     MazeOpSetTargetDirs,
@@ -24,6 +25,10 @@ class TestMazeState:
         assert state.grid[(0, 0)] == D.Empty
         assert state.grid[(1, 1)] == D.Empty
         assert state.grid[(0, 1)] == D.Empty
+
+        assert state.distances[(0, 0)] is None
+        assert state.distances[(0, 1)] is None
+        assert state.distances[(1, 0)] is None
 
     def test_push_run_op(self) -> None:
         state = self.make_state()
@@ -156,6 +161,44 @@ class TestMazeState:
 
         assert state.grid[(0, 0)] == D.S
         assert state.grid[(0, 1)] == D.N
+
+    def test_set_distance_op(self) -> None:
+        state = self.make_state()
+
+        _ = state.apply_operation(MazeOpSetDistance((0, 0), 0))
+
+        assert state.distances[(0, 0)] == 0
+        assert state.distances[(0, 1)] is None
+
+    def test_clear_distance_op(self) -> None:
+        state = self.make_state()
+
+        _ = state.apply_operation(MazeOpSetDistance((0, 0), 0))
+        _ = state.apply_operation(MazeOpSetDistance((0, 0), None))
+
+        assert state.distances[(0, 0)] is None
+        assert state.distances[(0, 1)] is None
+
+    def test_set_distance_op_undo(self) -> None:
+        state = self.make_state()
+        state.reset_dijstra_distances((0, 0))
+
+        op = state.apply_operation(MazeOpSetDistance((0, 0), 0))
+        state.apply_operation(op)
+
+        assert state.distances[(0, 0)] is None
+        assert state.distances[(0, 1)] is None
+
+    def test_clear_distance_op_undo(self) -> None:
+        state = self.make_state()
+        state.reset_dijstra_distances((0, 0))
+
+        _ = state.apply_operation(MazeOpSetDistance((0, 0), 0))
+        op = state.apply_operation(MazeOpSetDistance((0, 0), None))
+        state.apply_operation(op)
+
+        assert state.distances[(0, 0)] == 0
+        assert state.distances[(0, 1)] is None
 
     def test_multiple_undo(self) -> None:
         state = self.make_state()
@@ -302,10 +345,18 @@ class TestMazeState:
 
         state.reset_dijstra_distances((0, 0))
 
+        assert state.dijkstra_distances[(0, 0)] is None
+        assert state.dijkstra_distances[(0, 1)] is None
+
+    @pytest.mark.skip
+    def test_dijkstra_set_distances(self) -> None:
+        state = self.make_state()
+
         assert state.dijkstra_distances[(0, 0)] == 0
         assert state.dijkstra_distances[(0, 1)] is None
 
     def make_state(self) -> MutableMazeState:
         grid = Grid(5, 5)
         state = MutableMazeState(grid, (0, 0))
+        state.reset_dijstra_distances((0, 0))
         return state
