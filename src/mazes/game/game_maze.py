@@ -135,6 +135,7 @@ class GameMaze:
     def single_step_dijkstra(self) -> None:
         self._pulse_tick = 0
         did_step = self._dijkstra_stepper.step_forward()
+        self.logger.debug("Dijkstra did_step forward: %r", did_step)
 
         if not did_step:
             self.logger.info("Dijkstra done!")
@@ -165,7 +166,8 @@ class GameMaze:
 
     def single_step_backward_dijkstra(self) -> None:
         self._pulse_tick = 0
-        _ = self._dijkstra_stepper.step_backward()
+        did_step = self._dijkstra_stepper.step_backward()
+        self.logger.debug("Dijkstra did_step backward: %r", did_step)
 
     def update(self) -> None:
         self.update_generation_timer()
@@ -223,6 +225,7 @@ class GameMaze:
         self._dijkstra_stepper = MazeStepper(
             self._maze.mutable_state, self._dijkstra.maze_steps()
         )
+        self.logger.debug("Dijkstra stepper: %r", self._dijkstra_stepper)
         self._state = self.State.Dijkstra
         self._pulse_gradient = ColorGradient((38, 139, 210), (22, 82, 124), 256)
         self._pulse_tick = 0
@@ -331,15 +334,13 @@ class GameMaze:
             return None
 
     def background_color_of_dijkstra(self, coord: Coordinate) -> Color | None:
-        if self._dijkstra is None:
-            return None
-        distances = self._dijkstra.distances
+        distances = self._maze.state.distances
         if distances is None:
             return None
         distance = distances[coord]
-        if distance is None:
+        max_distance = self._maze.state.max_distance
+        if distance is None or max_distance is None:
             return None
-        max_distance = distances.max_distance
 
         color: Color
         if distance == max_distance:

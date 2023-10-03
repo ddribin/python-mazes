@@ -9,6 +9,7 @@ from mazes.core.maze_state import (
     MazeOpPopRun,
     MazeOpPushRun,
     MazeOpSetDistance,
+    MazeOpSetMaxDistance,
     MazeOpSetRun,
     MazeOpSetTargetCoords,
     MazeOpSetTargetDirs,
@@ -29,6 +30,8 @@ class TestMazeState:
         assert state.distances[(0, 0)] is None
         assert state.distances[(0, 1)] is None
         assert state.distances[(1, 0)] is None
+        assert state.max_distance is None
+        assert state.max_coordinate is None
 
     def test_push_run_op(self) -> None:
         state = self.make_state()
@@ -181,7 +184,6 @@ class TestMazeState:
 
     def test_set_distance_op_undo(self) -> None:
         state = self.make_state()
-        state.reset_dijstra_distances((0, 0))
 
         op = state.apply_operation(MazeOpSetDistance((0, 0), 0))
         state.apply_operation(op)
@@ -199,6 +201,23 @@ class TestMazeState:
 
         assert state.distances[(0, 0)] == 0
         assert state.distances[(0, 1)] is None
+
+    def test_set_max_distance_op(self) -> None:
+        state = self.make_state()
+
+        _ = state.apply_operation(MazeOpSetMaxDistance((1, 1), 5))
+
+        assert state.max_distance == 5
+        assert state.max_coordinate == (1, 1)
+
+    def test_set_max_distance_op_undo(self) -> None:
+        state = self.make_state()
+
+        op = state.apply_operation(MazeOpSetMaxDistance((1, 1), 5))
+        state.apply_operation(op)
+
+        assert state.max_distance is None
+        assert state.max_coordinate is None
 
     def test_multiple_undo(self) -> None:
         state = self.make_state()
@@ -321,8 +340,14 @@ class TestMazeState:
         step = state.pop_maze_step()
         assert state.distances[(0, 0)] == 0
         assert state.distances[(0, 1)] is None
-        assert step.forward_operations == [MazeOpSetDistance((0, 0), 0)]
-        assert step.backward_operations == [MazeOpSetDistance((0, 0), None)]
+        assert step.forward_operations == [
+            MazeOpSetDistance((0, 0), 0),
+            MazeOpSetMaxDistance((0, 0), 0),
+        ]
+        assert step.backward_operations == [
+            MazeOpSetMaxDistance(None, None),
+            MazeOpSetDistance((0, 0), None),
+        ]
 
     def test_multiple_mutations(self) -> None:
         state = self.make_state()

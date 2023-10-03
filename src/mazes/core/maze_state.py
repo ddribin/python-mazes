@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import assert_never
 
-from ..distances import Distances, ImmutableDistances
+from ..distances import Distance, Distances, ImmutableDistances
 from ..grid import Coordinate, Direction, Grid, ImmutableGrid
 
 
@@ -49,6 +49,17 @@ class MazeOpSetDistance:
     distance: int | None
 
 
+@dataclass(frozen=True, slots=True)
+class MazeOpSetMaxDistance:
+    coord: Coordinate | None
+    distance: int | None
+
+    def __post_init__(self) -> None:
+        assert (self.coord is None and self.distance is None) or (
+            self.coord is not None and self.distance is not None
+        )
+
+
 MazeOperation = (
     MazeOpPushRun
     | MazeOpPopRun
@@ -58,6 +69,7 @@ MazeOperation = (
     | MazeOpSetTargetCoords
     | MazeOpSetTargetDirs
     | MazeOpSetDistance
+    | MazeOpSetMaxDistance
 )
 
 
@@ -78,6 +90,8 @@ class MazeState:
         self._grid = grid
         self._start = start
         self._distances = Distances(width, height, start)
+        self._max_distance: Distance = None
+        self._max_coordinate: Coordinate | None = None
         self._path = Distances(width, height, start)
         self._run: list[Coordinate] = []
         self._target_coordinates: list[Coordinate] = []
@@ -98,6 +112,14 @@ class MazeState:
     @property
     def distances(self) -> ImmutableDistances:
         return self._distances
+
+    @property
+    def max_distance(self) -> Distance:
+        return self._max_distance
+
+    @property
+    def max_coordinate(self) -> Coordinate | None:
+        return self._max_coordinate
 
     @property
     def path(self) -> ImmutableDistances:
@@ -155,6 +177,9 @@ class MutableMazeState(MazeState):
     def set_distances(self, coordinate: Coordinate, distance: int) -> None:
         op = MazeOpSetDistance(coordinate, distance)
         self._execute_operation(op)
+        if self._max_distance is None or distance > self._max_distance:
+            op = MazeOpSetMaxDistance(coordinate, distance)
+            self._execute_operation(op)
 
     def apply_operation(self, operation: MazeOperation) -> MazeOperation:
         match operation:
@@ -197,6 +222,13 @@ class MutableMazeState(MazeState):
                 else:
                     self._distances.clear_at(coord)
                 return MazeOpSetDistance(coord, prev_distance)
+
+            case MazeOpSetMaxDistance(coord, val):
+                prev_coord = self._max_coordinate
+                prev_val = self._max_distance
+                self._max_coordinate = coord
+                self._max_distance = val
+                return MazeOpSetMaxDistance(prev_coord, prev_val)
 
             case _:
                 assert_never(operation)
