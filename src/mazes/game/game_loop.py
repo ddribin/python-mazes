@@ -232,9 +232,3 @@ class GameLoop:
         screen.fill((238, 232, 213))
 
         self._maze.draw(screen)
-
-
-def main() -> int:
-    logging.basicConfig(level=logging.INFO)
-    game_loop = GameLoop()
-    return game_loop.execute()
