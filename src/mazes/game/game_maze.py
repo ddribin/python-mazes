@@ -12,6 +12,7 @@ from mazes import (
     Distances,
     MazeGenerator,
     MazeOptions,
+    MazeStepper,
 )
 from mazes.algorithms import Dijkstra
 
@@ -132,6 +133,14 @@ class GameMaze:
             self.setup_dijkstra()
 
     def single_step_dijkstra(self) -> None:
+        self._pulse_tick = 0
+        did_step = self._dijkstra_stepper.step_forward()
+
+        if not did_step:
+            self.logger.info("Dijkstra done!")
+            self.setup_done()
+
+    def single_step_dijkstra_x(self) -> None:
         try:
             assert self._dijkstra_steps is not None
             self._pulse_tick = 0
@@ -143,6 +152,8 @@ class GameMaze:
     def single_step_backward(self) -> None:
         if self._state is self.State.Generating:
             self.single_step_backward_generating()
+        if self._state is self.State.Dijkstra:
+            self.single_step_backward_dijkstra()
 
     def single_step_backward_generating(self) -> None:
         self._pulse_tick = 0
@@ -151,6 +162,10 @@ class GameMaze:
             self.update_cursors()
         else:
             self.clear_cursors()
+
+    def single_step_backward_dijkstra(self) -> None:
+        self._pulse_tick = 0
+        _ = self._dijkstra_stepper.step_backward()
 
     def update(self) -> None:
         self.update_generation_timer()
@@ -201,8 +216,13 @@ class GameMaze:
     def setup_dijkstra(self) -> None:
         self.clear_cursors()
         self._generation_timer_multiplier = 1
-        self._dijkstra = Dijkstra(self._maze.grid, self._maze.start)
+        self._dijkstra = Dijkstra(
+            self._maze.grid, self._maze.start, self._maze.mutable_state
+        )
         self._dijkstra_steps = self._dijkstra.steps()
+        self._dijkstra_stepper = MazeStepper(
+            self._maze.mutable_state, self._dijkstra.maze_steps()
+        )
         self._state = self.State.Dijkstra
         self._pulse_gradient = ColorGradient((38, 139, 210), (22, 82, 124), 256)
         self._pulse_tick = 0

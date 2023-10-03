@@ -100,6 +100,10 @@ class MazeGenerator:
         return self._maze_state
 
     @property
+    def mutable_state(self) -> MutableMazeState:
+        return self._maze_state
+
+    @property
     def targets(self) -> MazeState:
         return self._maze_state
 

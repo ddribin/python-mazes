@@ -152,6 +152,10 @@ class MutableMazeState(MazeState):
         op = MazeOpSetTargetCoords(coordinates)
         self._execute_operation(op)
 
+    def set_distances(self, coordinate: Coordinate, distance: int) -> None:
+        op = MazeOpSetDistance(coordinate, distance)
+        self._execute_operation(op)
+
     def apply_operation(self, operation: MazeOperation) -> MazeOperation:
         match operation:
             case MazeOpPushRun(val):

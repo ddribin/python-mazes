@@ -313,6 +313,17 @@ class TestMazeState:
         assert step.forward_operations == []
         assert step.backward_operations == []
 
+    def test_set_distances(self) -> None:
+        state = self.make_state()
+
+        state.set_distances((0, 0), 0)
+
+        step = state.pop_maze_step()
+        assert state.distances[(0, 0)] == 0
+        assert state.distances[(0, 1)] is None
+        assert step.forward_operations == [MazeOpSetDistance((0, 0), 0)]
+        assert step.backward_operations == [MazeOpSetDistance((0, 0), None)]
+
     def test_multiple_mutations(self) -> None:
         state = self.make_state()
 
@@ -338,22 +349,6 @@ class TestMazeState:
             MazeOpPopRun(),
             MazeOpSetTargetCoords([]),
         ]
-
-    @pytest.mark.skip
-    def test_dijkstra_distances_initial_state(self) -> None:
-        state = self.make_state()
-
-        state.reset_dijstra_distances((0, 0))
-
-        assert state.dijkstra_distances[(0, 0)] is None
-        assert state.dijkstra_distances[(0, 1)] is None
-
-    @pytest.mark.skip
-    def test_dijkstra_set_distances(self) -> None:
-        state = self.make_state()
-
-        assert state.dijkstra_distances[(0, 0)] == 0
-        assert state.dijkstra_distances[(0, 1)] is None
 
     def make_state(self) -> MutableMazeState:
         grid = Grid(5, 5)

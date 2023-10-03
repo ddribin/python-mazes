@@ -1,6 +1,6 @@
 import textwrap
 
-from mazes.distances import Distances
+from mazes.distances import ImmutableDistances
 
 
 def assert_render(actual: str, expected: str) -> None:
@@ -9,7 +9,7 @@ def assert_render(actual: str, expected: str) -> None:
     assert actual == expected
 
 
-def assert_distances(distances: Distances, expected: list[list[int]]) -> None:
+def assert_distances(distances: ImmutableDistances, expected: list[list[int]]) -> None:
     for y in range(distances.height):
         for x in range(distances.width):
             assert distances[x, y] == expected[y][x], f"({x=}, {y=})"

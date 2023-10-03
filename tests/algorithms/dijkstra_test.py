@@ -1,6 +1,7 @@
 from mazes.algorithms import Dijkstra
+from mazes.core import MutableMazeState
 from mazes.grid import Direction as D
-from mazes.grid import Grid, ImmutableGrid
+from mazes.grid import Grid
 from mazes.renderers import TextRenderer
 
 from ..asserts import assert_distances, assert_render
@@ -10,6 +11,26 @@ class TestDijkstra:
     def test_distances(self):
         dijkstra = self.generate_dijkstra()
         distances = dijkstra.distances
+
+        expected = [
+            [0, 1, 2, 9],
+            [7, 4, 3, 8],
+            [6, 5, 6, 7],
+            [7, 8, 7, 8],
+        ]
+
+        assert_distances(distances, expected)
+        assert distances.root == (0, 0)
+        assert distances.max_coordinate == (3, 0)
+        assert distances.max_distance == 9
+
+    def test_distances_steps(self):
+        grid = self.make_grid()
+        state = MutableMazeState(grid, (0, 0))
+        dijkstra = Dijkstra(grid, (0, 0), state)
+        for _ in dijkstra.maze_steps():
+            pass
+        distances = state.distances
 
         expected = [
             [0, 1, 2, 9],
@@ -63,7 +84,7 @@ class TestDijkstra:
         dijkstra.generate()
         return dijkstra
 
-    def make_grid(self) -> ImmutableGrid:
+    def make_grid(self) -> Grid:
         grid = Grid(4, 4)
 
         coord = grid.link_path((0, 0), [D.E, D.E, D.S, D.W, D.S])
