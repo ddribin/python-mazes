@@ -231,6 +231,32 @@ class GameMaze:
         self._pulse_tick = 0
 
     def update_dijkstra(self) -> None:
+        did_step = True
+        if self._generation_speed_sign > 0:
+            did_step = self.update_dijkstra_forward()
+        if self._generation_speed_sign < 0:
+            did_step = self.update_dijkstra_backward()
+
+        if not did_step:
+            self.logger.info("Dijkstra done!")
+            self.setup_done()
+
+    def update_dijkstra_forward(self) -> bool:
+        did_step = True
+        for _ in range(self._generation_timer_steps):
+            did_step = self._dijkstra_stepper.step_forward()
+            if not did_step:
+                break
+        return did_step
+
+    def update_dijkstra_backward(self) -> bool:
+        for _ in range(self._generation_timer_steps):
+            did_step = self._dijkstra_stepper.step_backward()
+            if not did_step:
+                break
+        return True
+
+    def update_dijkstra_x(self) -> None:
         try:
             for _ in range(self._generation_timer_steps):
                 assert self._dijkstra_steps is not None
@@ -251,9 +277,7 @@ class GameMaze:
             self._maze_stepper.step_forward_until_end()
             self.setup_dijkstra()
         elif self._state is self.State.Dijkstra:
-            assert self._dijkstra_steps is not None
-            for _ in self._dijkstra_steps:
-                pass
+            self._dijkstra_stepper.step_forward_until_end()
             self.setup_done()
 
     def draw(self, surface: pg.Surface) -> None:

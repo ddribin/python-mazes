@@ -105,7 +105,10 @@ class Dijkstra:
             pass
 
     def path_to(self, goal: Coordinate) -> Distances:
-        distances = self._distances
+        state = self._state
+        assert state is not None
+
+        distances = state.distances
         start = distances.root
         current = goal
         grid = self._grid

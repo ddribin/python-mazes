@@ -31,6 +31,7 @@ class CommandLine:
             "--log",
             choices=["debug", "info", "warning", "error"],
             default="warning",
+            help="Set log level",
         )
 
         args = parser.parse_args()
