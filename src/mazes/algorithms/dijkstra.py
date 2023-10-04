@@ -101,7 +101,7 @@ class Dijkstra:
         self._max_coordinate = max_coord
 
     def generate(self) -> None:
-        for _ in self.steps():
+        for _ in self.maze_steps():
             pass
 
     def path_to(self, goal: Coordinate) -> Distances:

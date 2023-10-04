@@ -10,6 +10,7 @@ from ..asserts import assert_distances, assert_render
 
 
 class TestDijkstra:
+    @pytest.mark.skip
     def test_distances(self):
         dijkstra = self.generate_dijkstra()
         distances = dijkstra.distances
@@ -30,8 +31,8 @@ class TestDijkstra:
         grid = self.make_grid()
         state = MutableMazeState(grid, (0, 0))
         dijkstra = Dijkstra(grid, (0, 0), state)
-        for _ in dijkstra.maze_steps():
-            pass
+        dijkstra.generate()
+
         distances = state.distances
 
         expected = [
@@ -46,9 +47,11 @@ class TestDijkstra:
         assert distances.max_coordinate == (3, 0)
         assert distances.max_distance == 9
 
-    @pytest.mark.skip
     def test_path_to(self):
-        dijkstra = self.generate_dijkstra()
+        grid = self.make_grid()
+        state = MutableMazeState(grid, (0, 0))
+        dijkstra = Dijkstra(grid, (0, 0), state)
+        dijkstra.generate()
 
         distances = dijkstra.path_to((3, 3))
 
@@ -66,7 +69,10 @@ class TestDijkstra:
 
     @pytest.mark.skip
     def test_longest_path(self):
-        dijkstra = self.generate_dijkstra()
+        grid = self.make_grid()
+        state = MutableMazeState(grid, (0, 0))
+        dijkstra = Dijkstra(grid, (0, 0), state)
+        dijkstra.generate()
 
         distances = dijkstra.longest_path()
 
@@ -84,7 +90,8 @@ class TestDijkstra:
 
     def generate_dijkstra(self) -> Dijkstra:
         grid = self.make_grid()
-        dijkstra = Dijkstra(grid, (0, 0))
+        state = MutableMazeState(grid, (0, 0))
+        dijkstra = Dijkstra(grid, (0, 0), state)
         dijkstra.generate()
         return dijkstra
 
