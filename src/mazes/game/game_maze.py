@@ -1,6 +1,5 @@
 import logging
 import math
-from collections.abc import Iterator
 from enum import Enum, auto
 
 import pygame as pg
@@ -82,7 +81,6 @@ class GameMaze:
         self._generation_timer_steps = 0
         self._generation_timer_multiplier = 3
         self._dijkstra: Dijkstra | None = None
-        self._dijkstra_steps: Iterator[None] | None = None
         self._path_distances: Distances | None = None
         self._pulse_gradient = ColorGradient((220, 50, 47), (235, 136, 134), 256)
         self._pulse_tick = 0
@@ -141,15 +139,6 @@ class GameMaze:
             self.logger.info("Dijkstra done!")
             self.setup_done()
 
-    def single_step_dijkstra_x(self) -> None:
-        try:
-            assert self._dijkstra_steps is not None
-            self._pulse_tick = 0
-            next(self._dijkstra_steps)
-        except StopIteration:
-            self.logger.info("Dijkstra done!")
-            self.setup_done()
-
     def single_step_backward(self) -> None:
         if self._state is self.State.Generating:
             self.single_step_backward_generating()
@@ -190,9 +179,9 @@ class GameMaze:
     def update_generating(self) -> None:
         did_step = True
         if self._generation_speed_sign > 0:
-            did_step = self.update_generating_forward()
+            did_step = self.update_stepper_forward(self._maze_stepper)
         if self._generation_speed_sign < 0:
-            did_step = self.update_generating_backward()
+            did_step = self.update_stepper_backward(self._maze_stepper)
 
         if did_step:
             self.update_cursors()
@@ -200,28 +189,12 @@ class GameMaze:
             self.logger.info("Maze done!")
             self.setup_dijkstra()
 
-    def update_generating_forward(self) -> bool:
-        did_step = True
-        for _ in range(self._generation_timer_steps):
-            did_step = self._maze_stepper.step_forward()
-            if not did_step:
-                break
-        return did_step
-
-    def update_generating_backward(self) -> bool:
-        for _ in range(self._generation_timer_steps):
-            did_step = self._maze_stepper.step_backward()
-            if not did_step:
-                break
-        return True
-
     def setup_dijkstra(self) -> None:
         self.clear_cursors()
         self._generation_timer_multiplier = 1
         self._dijkstra = Dijkstra(
             self._maze.grid, self._maze.start, self._maze.mutable_state
         )
-        self._dijkstra_steps = self._dijkstra.steps()
         self._dijkstra_stepper = MazeStepper(
             self._maze.mutable_state, self._dijkstra.maze_steps()
         )
@@ -233,37 +206,28 @@ class GameMaze:
     def update_dijkstra(self) -> None:
         did_step = True
         if self._generation_speed_sign > 0:
-            did_step = self.update_dijkstra_forward()
+            did_step = self.update_stepper_forward(self._dijkstra_stepper)
         if self._generation_speed_sign < 0:
-            did_step = self.update_dijkstra_backward()
+            did_step = self.update_stepper_backward(self._dijkstra_stepper)
 
         if not did_step:
             self.logger.info("Dijkstra done!")
             self.setup_done()
 
-    def update_dijkstra_forward(self) -> bool:
+    def update_stepper_forward(self, stepper: MazeStepper) -> bool:
         did_step = True
         for _ in range(self._generation_timer_steps):
-            did_step = self._dijkstra_stepper.step_forward()
+            did_step = stepper.step_forward()
             if not did_step:
                 break
         return did_step
 
-    def update_dijkstra_backward(self) -> bool:
+    def update_stepper_backward(self, stepper: MazeStepper) -> bool:
         for _ in range(self._generation_timer_steps):
-            did_step = self._dijkstra_stepper.step_backward()
+            did_step = stepper.step_backward()
             if not did_step:
                 break
         return True
-
-    def update_dijkstra_x(self) -> None:
-        try:
-            for _ in range(self._generation_timer_steps):
-                assert self._dijkstra_steps is not None
-                next(self._dijkstra_steps)
-        except StopIteration:
-            self.logger.info("Dijkstra done!")
-            self.setup_done()
 
     def setup_done(self) -> None:
         assert self._dijkstra is not None
