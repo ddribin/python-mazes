@@ -193,7 +193,6 @@ class TestMazeState:
 
     def test_clear_distance_op_undo(self) -> None:
         state = self.make_state()
-        state.reset_dijstra_distances((0, 0))
 
         _ = state.apply_operation(MazeOpSetDistance((0, 0), 0))
         op = state.apply_operation(MazeOpSetDistance((0, 0), None))
@@ -378,5 +377,4 @@ class TestMazeState:
     def make_state(self) -> MutableMazeState:
         grid = Grid(5, 5)
         state = MutableMazeState(grid, (0, 0))
-        state.reset_dijstra_distances((0, 0))
         return state

@@ -175,7 +175,7 @@ class MutableMazeState(MazeState):
         self._execute_operation(op)
 
     def set_distances(self, coordinate: Coordinate, distance: int) -> None:
-        op = MazeOpSetDistance(coordinate, distance)
+        op: MazeOperation = MazeOpSetDistance(coordinate, distance)
         self._execute_operation(op)
         if self._max_distance is None or distance > self._max_distance:
             op = MazeOpSetMaxDistance(coordinate, distance)
@@ -232,13 +232,6 @@ class MutableMazeState(MazeState):
 
             case _:
                 assert_never(operation)
-
-    def reset_dijstra_distances(self, start: Coordinate) -> None:
-        ...
-
-    @property
-    def dijkstra_distances(self) -> Distances:
-        ...
 
     def _execute_operation(self, op: MazeOperation) -> None:
         backward_op = self.apply_operation(op)

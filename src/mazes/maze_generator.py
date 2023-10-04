@@ -110,8 +110,5 @@ class MazeGenerator:
     def make_stepper(self) -> MazeStepper:
         return MazeStepper(self._maze_state, self._algorithm.maze_steps())
 
-    def dijkstra_stepper(self, start: Coordinate) -> MazeStepper:
-        ...
-
     def apply_operation(self, operation: MazeOperation) -> None:
         self._maze_state.apply_operation(operation)
