@@ -248,6 +248,8 @@ class GameMaze:
         start_x, start_y = (self._padding_x, self._padding_y)
         x, y = (start_x, start_y)
         fg = (0, 0, 0)
+        line_width = 3
+        line_offset = line_width // 2
 
         cell_width = self._cell_width
         cell_height = self._cell_height
@@ -264,19 +266,53 @@ class GameMaze:
                     pg.draw.rect(surface, rect_color, rect)
 
                 if Direction.N not in dir:
-                    pg.draw.line(surface, fg, (x, y), (x + cell_width, y))
+                    # Horizontal line
+                    pg.draw.line(
+                        surface,
+                        fg,
+                        (x - line_offset, y),
+                        (x + cell_width + line_offset, y),
+                        line_width,
+                    )
+                else:
+                    pg.draw.line(
+                        surface,
+                        fg,
+                        (x - line_offset, y),
+                        (x + line_offset, y),
+                        line_width,
+                    )
                 if Direction.W not in dir:
-                    pg.draw.line(surface, fg, (x, y), (x, y + cell_height))
+                    # Vertical line
+                    pg.draw.line(
+                        surface,
+                        fg,
+                        (x, y - line_offset),
+                        (x, y + cell_height + line_offset),
+                        line_width,
+                    )
                 x += cell_width
             x = start_x
             y += cell_height
         end_x = start_x + self._grid_width * cell_width
         end_y = start_y + self._grid_height * cell_height
 
-        # Draw right edge
-        pg.draw.line(surface, fg, (end_x, start_y), (end_x, end_y))
-        # Draw bottom edge
-        pg.draw.line(surface, fg, (start_x, end_y), (end_x, end_y))
+        # Draw right edge (vertical)
+        pg.draw.line(
+            surface,
+            fg,
+            (end_x, start_y - line_offset),
+            (end_x, end_y + line_offset),
+            line_width,
+        )
+        # Draw bottom edge (horizontal )
+        pg.draw.line(
+            surface,
+            fg,
+            (start_x - line_offset, end_y),
+            (end_x + line_offset, end_y),
+            line_width,
+        )
 
     def background_color_of(self, coord: Coordinate, dir: Direction) -> Color | None:
         color = self.background_color_of_cursor(coord)
