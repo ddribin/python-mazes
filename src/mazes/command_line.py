@@ -127,3 +127,7 @@ class CommandLine:
 def main() -> int:
     cli = CommandLine()
     return cli.execute()
+
+
+if __name__ == "__main__":
+    main()
